@@ -1,0 +1,16 @@
+language: rust
+
+rust:
+  - stable
+  - beta
+  - nightly
+
+cache: cargo
+
+script:
+  - cargo test
+
+addons:
+  apt:
+    packages:
+      - gcc
