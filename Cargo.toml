@@ -1,0 +1,8 @@
+[package]
+name = "sfmt"
+version = "0.1.0"
+authors = ["Toshiki Teramura <toshiki.teramura@gmail.com>"]
+
+links = "sfmt"
+
+[dependencies]
