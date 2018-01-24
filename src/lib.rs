@@ -57,25 +57,27 @@ extern "C" {
 
 #[cfg(test)]
 mod test {
+    use super::*;
+
     #[test]
     fn bindgen_test_layout_w128() {
         assert_eq!(
-            ::std::mem::size_of::<w128>(),
+            ::core::mem::size_of::<w128>(),
             16usize,
             concat!("Size of: ", stringify!(w128))
         );
         assert_eq!(
-            ::std::mem::align_of::<w128>(),
+            ::core::mem::align_of::<w128>(),
             8usize,
             concat!("Alignment of ", stringify!(w128))
         );
         assert_eq!(
-            unsafe { &(*(::std::ptr::null::<w128>())).u as *const _ as usize },
+            unsafe { &(*(::core::ptr::null::<w128>())).u as *const _ as usize },
             0usize,
             concat!("Offset of field: ", stringify!(w128), "::", stringify!(u))
         );
         assert_eq!(
-            unsafe { &(*(::std::ptr::null::<w128>())).u64 as *const _ as usize },
+            unsafe { &(*(::core::ptr::null::<w128>())).u64 as *const _ as usize },
             0usize,
             concat!("Offset of field: ", stringify!(w128), "::", stringify!(u64))
         );
@@ -84,17 +86,17 @@ mod test {
     #[test]
     fn bindgen_test_layout_sfmt() {
         assert_eq!(
-            ::std::mem::size_of::<SFMT>(),
+            ::core::mem::size_of::<SFMT>(),
             2504usize,
             concat!("Size of: ", stringify!(SFMT))
         );
         assert_eq!(
-            ::std::mem::align_of::<SFMT>(),
+            ::core::mem::align_of::<SFMT>(),
             8usize,
             concat!("Alignment of ", stringify!(SFMT))
         );
         assert_eq!(
-            unsafe { &(*(::std::ptr::null::<SFMT>())).state as *const _ as usize },
+            unsafe { &(*(::core::ptr::null::<SFMT>())).state as *const _ as usize },
             0usize,
             concat!(
                 "Offset of field: ",
@@ -104,7 +106,7 @@ mod test {
             )
         );
         assert_eq!(
-            unsafe { &(*(::std::ptr::null::<SFMT>())).idx as *const _ as usize },
+            unsafe { &(*(::core::ptr::null::<SFMT>())).idx as *const _ as usize },
             2496usize,
             concat!("Offset of field: ", stringify!(SFMT), "::", stringify!(idx))
         );
