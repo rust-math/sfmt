@@ -1,6 +1,8 @@
 sfmt
 -----
 
+[![Build Status](https://travis-ci.org/termoshtt/rust-sfmt.svg?branch=master)](https://travis-ci.org/termoshtt/rust-sfmt)
+
 Rust binding of [SIMD-oriented Fast Mersenne Twister (SFMT)] and dSFMT
 
 [SIMD-oriented Fast Mersenne Twister (SFMT)]: http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/
