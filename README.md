@@ -12,7 +12,7 @@ Usage
 
 Require external programs for build.
 
-‐ gcc
+- gcc
 - curl
 
 License
