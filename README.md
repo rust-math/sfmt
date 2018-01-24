@@ -5,6 +5,14 @@ Rust binding of [SIMD-oriented Fast Mersenne Twister (SFMT)] and dSFMT
 
 [SIMD-oriented Fast Mersenne Twister (SFMT)]: http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/
 
+Usage
+------
+
+Require external programs for build.
+
+‐ gcc
+- curl
+
 License
 --------
 
