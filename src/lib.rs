@@ -27,6 +27,34 @@ extern "C" {
     pub fn sfmt_init_gen_rand(sfmt: *mut SFMT, seed: u32);
 }
 
+/// the 128-bit internal state array
+#[repr(C)]
+pub struct DSFMT {
+    pub status: [w128; 192usize],
+    pub idx: i32,
+}
+
+extern "C" {
+    #[link_name = "\u{1}dsfmt_global_data"]
+    pub static mut dsfmt_global_data: DSFMT;
+    #[link_name = "\u{1}dsfmt_global_mexp"]
+    pub static mut dsfmt_global_mexp: i32;
+    pub fn dsfmt_gen_rand_all(dsfmt: *mut DSFMT);
+    pub fn dsfmt_fill_array_open_close(dsfmt: *mut DSFMT, array: *mut f64, size: i32);
+    pub fn dsfmt_fill_array_close_open(dsfmt: *mut DSFMT, array: *mut f64, size: i32);
+    pub fn dsfmt_fill_array_open_open(dsfmt: *mut DSFMT, array: *mut f64, size: i32);
+    pub fn dsfmt_fill_array_close1_open2(dsfmt: *mut DSFMT, array: *mut f64, size: i32);
+    pub fn dsfmt_chk_init_gen_rand(dsfmt: *mut DSFMT, seed: u32, mexp: i32);
+    pub fn dsfmt_chk_init_by_array(
+        dsfmt: *mut DSFMT,
+        init_key: *mut u32,
+        key_length: i32,
+        mexp: i32,
+    );
+    pub fn dsfmt_get_idstring() -> *const i8;
+    pub fn dsfmt_get_min_array_size() -> i32;
+}
+
 #[cfg(test)]
 mod test {
     #[test]
@@ -79,6 +107,40 @@ mod test {
             unsafe { &(*(::std::ptr::null::<SFMT>())).idx as *const _ as usize },
             2496usize,
             concat!("Offset of field: ", stringify!(SFMT), "::", stringify!(idx))
+        );
+    }
+
+    #[test]
+    fn bindgen_test_layout_dsfmt() {
+        assert_eq!(
+            ::core::mem::size_of::<DSFMT>(),
+            3080usize,
+            concat!("Size of: ", stringify!(DSFMT))
+        );
+        assert_eq!(
+            ::core::mem::align_of::<DSFMT>(),
+            8usize,
+            concat!("Alignment of ", stringify!(DSFMT))
+        );
+        assert_eq!(
+            unsafe { &(*(::core::ptr::null::<DSFMT>())).status as *const _ as usize },
+            0usize,
+            concat!(
+                "Offset of field: ",
+                stringify!(DSFMT),
+                "::",
+                stringify!(status)
+            )
+        );
+        assert_eq!(
+            unsafe { &(*(::core::ptr::null::<DSFMT>())).idx as *const _ as usize },
+            3072usize,
+            concat!(
+                "Offset of field: ",
+                stringify!(DSFMT),
+                "::",
+                stringify!(idx)
+            )
         );
     }
 }
