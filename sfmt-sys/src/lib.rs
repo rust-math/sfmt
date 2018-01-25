@@ -1,7 +1,6 @@
-#![no_std]
-
 /// 128-bit data structure
 #[repr(C)]
+#[derive(Clone, Copy)]
 pub union w128 {
     pub u: [u32; 4usize],
     pub u64: [u64; 2usize],
@@ -9,6 +8,7 @@ pub union w128 {
 
 /// SFMT internal state
 #[repr(C)]
+#[derive(Clone)]
 pub struct SFMT {
     /// the 128-bit internal state array
     pub state: [w128; 156usize],
