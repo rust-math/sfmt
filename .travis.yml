@@ -9,6 +9,7 @@ cache: cargo
 
 script:
   - cargo test -v
+  - cargo bench
   - cd sfmt-sys && cargo test -v
 
 addons:
