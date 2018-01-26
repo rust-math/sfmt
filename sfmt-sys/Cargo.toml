@@ -2,4 +2,10 @@
 name = "sfmt-sys"
 version = "0.1.0"
 authors = ["Toshiki Teramura <toshiki.teramura@gmail.com>"]
+description = "Rust wrapper of SFMT"
+documentation = "https://docs.rs/sfmt-sys/"
+repository = "https://github.com/termoshtt/rust-sfmt"
+keywords = ["random", "rng"]
+categories = ["algorithms"]
+license = "MIT"
 links = "sfmt"
