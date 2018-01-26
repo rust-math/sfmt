@@ -1,7 +1,6 @@
-#![no_std]
-
 /// 128-bit data structure
 #[repr(C)]
+#[derive(Clone, Copy)]
 pub union w128 {
     pub u: [u32; 4usize],
     pub u64: [u64; 2usize],
@@ -9,6 +8,7 @@ pub union w128 {
 
 /// SFMT internal state
 #[repr(C)]
+#[derive(Clone)]
 pub struct SFMT {
     /// the 128-bit internal state array
     pub state: [w128; 156usize],
@@ -62,22 +62,22 @@ mod test {
     #[test]
     fn bindgen_test_layout_w128() {
         assert_eq!(
-            ::core::mem::size_of::<w128>(),
+            ::std::mem::size_of::<w128>(),
             16usize,
             concat!("Size of: ", stringify!(w128))
         );
         assert_eq!(
-            ::core::mem::align_of::<w128>(),
+            ::std::mem::align_of::<w128>(),
             8usize,
             concat!("Alignment of ", stringify!(w128))
         );
         assert_eq!(
-            unsafe { &(*(::core::ptr::null::<w128>())).u as *const _ as usize },
+            unsafe { &(*(::std::ptr::null::<w128>())).u as *const _ as usize },
             0usize,
             concat!("Offset of field: ", stringify!(w128), "::", stringify!(u))
         );
         assert_eq!(
-            unsafe { &(*(::core::ptr::null::<w128>())).u64 as *const _ as usize },
+            unsafe { &(*(::std::ptr::null::<w128>())).u64 as *const _ as usize },
             0usize,
             concat!("Offset of field: ", stringify!(w128), "::", stringify!(u64))
         );
@@ -86,17 +86,17 @@ mod test {
     #[test]
     fn bindgen_test_layout_sfmt() {
         assert_eq!(
-            ::core::mem::size_of::<SFMT>(),
+            ::std::mem::size_of::<SFMT>(),
             2504usize,
             concat!("Size of: ", stringify!(SFMT))
         );
         assert_eq!(
-            ::core::mem::align_of::<SFMT>(),
+            ::std::mem::align_of::<SFMT>(),
             8usize,
             concat!("Alignment of ", stringify!(SFMT))
         );
         assert_eq!(
-            unsafe { &(*(::core::ptr::null::<SFMT>())).state as *const _ as usize },
+            unsafe { &(*(::std::ptr::null::<SFMT>())).state as *const _ as usize },
             0usize,
             concat!(
                 "Offset of field: ",
@@ -106,7 +106,7 @@ mod test {
             )
         );
         assert_eq!(
-            unsafe { &(*(::core::ptr::null::<SFMT>())).idx as *const _ as usize },
+            unsafe { &(*(::std::ptr::null::<SFMT>())).idx as *const _ as usize },
             2496usize,
             concat!("Offset of field: ", stringify!(SFMT), "::", stringify!(idx))
         );
@@ -115,17 +115,17 @@ mod test {
     #[test]
     fn bindgen_test_layout_dsfmt() {
         assert_eq!(
-            ::core::mem::size_of::<DSFMT>(),
+            ::std::mem::size_of::<DSFMT>(),
             3080usize,
             concat!("Size of: ", stringify!(DSFMT))
         );
         assert_eq!(
-            ::core::mem::align_of::<DSFMT>(),
+            ::std::mem::align_of::<DSFMT>(),
             8usize,
             concat!("Alignment of ", stringify!(DSFMT))
         );
         assert_eq!(
-            unsafe { &(*(::core::ptr::null::<DSFMT>())).status as *const _ as usize },
+            unsafe { &(*(::std::ptr::null::<DSFMT>())).status as *const _ as usize },
             0usize,
             concat!(
                 "Offset of field: ",
@@ -135,7 +135,7 @@ mod test {
             )
         );
         assert_eq!(
-            unsafe { &(*(::core::ptr::null::<DSFMT>())).idx as *const _ as usize },
+            unsafe { &(*(::std::ptr::null::<DSFMT>())).idx as *const _ as usize },
             3072usize,
             concat!(
                 "Offset of field: ",
