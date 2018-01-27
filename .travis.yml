@@ -8,8 +8,7 @@ rust:
 cache: cargo
 
 script:
-  - cargo test -v
-  - cd sfmt-sys && cargo test -v
+  - ./ci.sh
 
 addons:
   apt:
