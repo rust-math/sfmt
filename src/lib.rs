@@ -34,6 +34,11 @@ impl SFMT {
         unsafe { ffi::sfmt_init_gen_rand(&mut sfmt.0 as *mut _, seed) };
         sfmt
     }
+
+    /// Use fixed seed (`1234`)
+    pub fn unseeded() -> Self {
+        Self::new(1234)
+    }
 }
 
 impl Rng for SFMT {
