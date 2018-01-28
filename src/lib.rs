@@ -39,6 +39,11 @@ impl SFMT {
     pub fn unseeded() -> Self {
         Self::new(1234)
     }
+
+    pub fn fill_array32(&mut self, a: &mut [u32]) {
+        let n = a.len() as i32;
+        unsafe { ffi::sfmt_fill_array32(&mut self.0 as *mut _, a.as_mut_ptr(), n) };
+    }
 }
 
 impl Rng for SFMT {
@@ -73,6 +78,19 @@ mod test {
         let mut sfmt = SFMT::new(1234);
         for (t, val) in ans.into_iter().enumerate() {
             let r = sfmt.next_u32();
+            println!("[{}] gen = {}, ans = {}", t, r, val);
+            assert_eq!(r, val);
+        }
+    }
+
+    #[test]
+    fn fill_array32() {
+        let ans = read_answer().expect("Failed to load answers");
+        let mut sfmt = SFMT::new(1234);
+        let mut arr = vec![0_u32; ans.len()];
+        sfmt.fill_array32(&mut arr);
+        for (t, val) in ans.into_iter().enumerate() {
+            let r = arr[t];
             println!("[{}] gen = {}, ans = {}", t, r, val);
             assert_eq!(r, val);
         }
