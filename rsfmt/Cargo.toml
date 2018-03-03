@@ -1,0 +1,7 @@
+[package]
+name = "rsfmt"
+version = "0.1.0"
+authors = ["Toshiki Teramura <toshiki.teramura@gmail.com>"]
+
+[dependencies]
+stdsimd = "0.0.3"
