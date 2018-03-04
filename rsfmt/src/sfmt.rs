@@ -55,7 +55,7 @@ pub fn sfmt_gen_rand_all(sfmt: &mut SFMT) {
 }
 
 pub fn period_certification(sfmt: &mut SFMT) {
-    let mut inner = 0;
+    let mut inner = 0_u32;
     let st = &mut sfmt.state[0];
     let parity = [SFMT_PARITY1, SFMT_PARITY2, SFMT_PARITY3, SFMT_PARITY4];
     for i in 0..4 {
@@ -69,14 +69,15 @@ pub fn period_certification(sfmt: &mut SFMT) {
         return;
     }
     for i in 0..4 {
-        let mut work = 1;
+        let mut work = 1_u32;
         for _ in 0..32 {
             if (work & parity[i]) != 0 {
                 let val = st.extract(i as u32) as u32 ^ work;
-                st.replace(i as u32, val as i32);
+                let val = st.replace(i as u32, val as i32);
+                ::std::mem::replace(st, val);
                 return;
             }
-            work <<= 1;
+            work = work << 1;
         }
     }
 }
@@ -114,7 +115,6 @@ mod tests {
 
     fn read_answer(filename: &str) -> Result<Vec<i32x4>, io::Error> {
         let f = io::BufReader::new(fs::File::open(filename)?);
-        let buf = String::new();
         Ok(f.lines()
             .map(|line| {
                 let vals: Vec<_> = line.unwrap()
@@ -131,6 +131,8 @@ mod tests {
         let sfmt = SFMT::new(1234);
         let ans = read_answer("init1234.txt").unwrap();
         for (v, a) in sfmt.state.iter().zip(ans.iter()) {
+            println!("v = {:?}", v);
+            println!("a = {:?}", a);
             assert_eq!(v, a);
         }
     }
