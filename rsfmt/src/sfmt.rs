@@ -83,9 +83,9 @@ pub fn period_certification(sfmt: &mut SFMT) {
 
 fn iterate(pre: i32, i: i32) -> i32 {
     use std::num::Wrapping;
-    let pre = Wrapping(pre);
-    let i = Wrapping(i);
-    (Wrapping(1812433253) * (pre ^ (pre >> 30)) + i).0
+    let pre = Wrapping(pre as u32);
+    let i = Wrapping(i as u32);
+    (Wrapping(1812433253) * (pre ^ (pre >> 30)) + i).0 as i32
 }
 
 fn map(a: i32, idx: i32) -> (i32x4, i32) {
@@ -110,6 +110,30 @@ pub fn sfmt_init_gen_rand(sfmt: &mut SFMT, seed: u32) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::{fs, io, io::BufRead};
+
+    fn read_answer(filename: &str) -> Result<Vec<i32x4>, io::Error> {
+        let f = io::BufReader::new(fs::File::open(filename)?);
+        let buf = String::new();
+        Ok(f.lines()
+            .map(|line| {
+                let vals: Vec<_> = line.unwrap()
+                    .split(" ")
+                    .map(|s| s.trim().parse().unwrap())
+                    .collect();
+                i32x4::new(vals[0], vals[1], vals[2], vals[3])
+            })
+            .collect())
+    }
+
+    #[test]
+    fn test_init() {
+        let sfmt = SFMT::new(1234);
+        let ans = read_answer("init1234.txt").unwrap();
+        for (v, a) in sfmt.state.iter().zip(ans.iter()) {
+            assert_eq!(v, a);
+        }
+    }
 
     #[test]
     fn test_mm_recursion() {
