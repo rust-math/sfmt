@@ -106,3 +106,22 @@ pub fn sfmt_init_gen_rand(sfmt: &mut SFMT, seed: u32) {
     sfmt.idx = SFMT_N32;
     period_certification(sfmt);
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_mm_recursion() {
+        let a = i32x4::new(1, 2, 3, 4);
+        let b = i32x4::new(431, 232, 83, 14);
+        let c = i32x4::new(213, 22, 93, 234);
+        let d = i32x4::new(112, 882, 23, 124);
+        let z = mm_recursion(a.into(), a, a.into(), a);
+        let zc = i32x4::new(33816833, 50856450, 67896067, 1049604); // calculated by C code
+        assert_eq!(z, zc);
+        let z = mm_recursion(a.into(), b, c.into(), d);
+        let zc = i32x4::new(398459137, 1355284994, -363068669, 32506884); // calculated by C code
+        assert_eq!(z, zc);
+    }
+}
