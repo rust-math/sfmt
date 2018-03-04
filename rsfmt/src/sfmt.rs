@@ -93,7 +93,7 @@ fn map(a: i32, idx: i32) -> (i32x4, i32) {
     let b = iterate(a, 4 * idx + 1);
     let c = iterate(b, 4 * idx + 2);
     let d = iterate(c, 4 * idx + 3);
-    let a2 = iterate(c, 4 * idx + 4);
+    let a2 = iterate(d, 4 * idx + 4);
     (i32x4::new(a, b, c, d), a2)
 }
 
