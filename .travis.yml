@@ -9,7 +9,8 @@ cache: cargo
 
 script:
   - cargo test -v
-  - cd sfmt-sys && cargo test -v
+  - cd sfmt-sys && cargo test -v && cd ..
+  - cd rsfmt && cargo test -v && cd ..
 
 addons:
   apt:
