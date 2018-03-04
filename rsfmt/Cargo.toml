@@ -5,3 +5,4 @@ authors = ["Toshiki Teramura <toshiki.teramura@gmail.com>"]
 
 [dependencies]
 stdsimd = "0.0.3"
+rand = "0.4"

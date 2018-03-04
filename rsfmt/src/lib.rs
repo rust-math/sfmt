@@ -1,5 +1,7 @@
+extern crate rand;
 extern crate stdsimd;
 
+use rand::Rng;
 use stdsimd::simd::*;
 use stdsimd::vendor::*;
 
@@ -27,6 +29,39 @@ pub struct SFMT {
     pub state: [i32x4; SFMT_N],
     /// index counter to the 32-bit internal state array
     pub idx: usize,
+}
+
+impl SFMT {
+    pub fn new(seed: u32) -> Self {
+        let mut sfmt = SFMT {
+            state: [i32x4::new(0, 0, 0, 0); SFMT_N],
+            idx: 0,
+        };
+        sfmt_init_gen_rand(&mut sfmt, seed);
+        sfmt
+    }
+
+    fn pop(&mut self) -> u32 {
+        let val = self.state[self.idx / 4].extract((self.idx % 4) as u32) as u32;
+        self.idx += 1;
+        val
+    }
+
+    fn gen_all(&mut self) {
+        unsafe {
+            sfmt_gen_rand_all(self);
+        }
+        self.idx = 0;
+    }
+}
+
+impl Rng for SFMT {
+    fn next_u32(&mut self) -> u32 {
+        if self.idx >= SFMT_N32 {
+            self.gen_all();
+        }
+        self.pop()
+    }
 }
 
 unsafe fn mm_recursion(a: i8x16, b: i32x4, c: i8x16, d: i32x4) -> i32x4 {
@@ -108,4 +143,30 @@ pub fn sfmt_init_gen_rand(sfmt: &mut SFMT, seed: u32) {
     }
     sfmt.idx = SFMT_N32;
     period_certification(sfmt);
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use std::io::Read;
+
+    fn read_answer() -> Result<Vec<u32>, std::io::Error> {
+        let mut f = std::fs::File::open("SFMT_19937.txt")?;
+        let mut buf = String::new();
+        f.read_to_string(&mut buf)?;
+        Ok(buf.split(" ")
+            .map(|s| s.trim().parse().expect("Failed to parse into u32"))
+            .collect())
+    }
+
+    #[test]
+    fn gen_u32() {
+        let ans = read_answer().expect("Failed to load answers");
+        let mut sfmt = SFMT::new(1234);
+        for (t, val) in ans.into_iter().enumerate() {
+            let r = sfmt.next_u32();
+            println!("[{}] gen = {}, ans = {}", t, r, val);
+            assert_eq!(r, val);
+        }
+    }
 }
