@@ -8,9 +8,7 @@ rust:
 cache: cargo
 
 script:
-  - cargo test -v
-  - cd sfmt-sys && cargo test -v && cd ..
-  - "[[ $TRAVIS_RUST_VERSION = nightly ]] && cd rsfmt && cargo test -v && cd .."
+  - ./ci.sh
 
 addons:
   apt:
