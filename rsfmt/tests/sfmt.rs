@@ -6,7 +6,7 @@ use rand::Rng;
 use std::io::Read;
 
 fn read_answer() -> Result<Vec<u32>, std::io::Error> {
-    let mut f = std::fs::File::open("SFMT_19937.txt")?;
+    let mut f = std::fs::File::open("check/SFMT_19937.txt")?;
     let mut buf = String::new();
     f.read_to_string(&mut buf)?;
     Ok(buf.split(" ")

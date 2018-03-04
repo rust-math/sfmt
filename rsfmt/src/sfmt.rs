@@ -129,7 +129,7 @@ mod tests {
     #[test]
     fn test_init() {
         let sfmt = SFMT::new(1234);
-        let ans = read_answer("init1234.txt").unwrap();
+        let ans = read_answer("check/init1234.txt").unwrap();
         for (v, a) in sfmt.state.iter().zip(ans.iter()) {
             println!("v = {:?}", v);
             println!("a = {:?}", a);
