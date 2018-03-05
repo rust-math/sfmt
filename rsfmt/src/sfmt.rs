@@ -1,7 +1,6 @@
 //! Rust re-implementation of SFMT
 
-use stdsimd::simd::*;
-use stdsimd::vendor::*;
+use std::simd::{i32x4, u32x4};
 
 use super::SFMT;
 
@@ -24,17 +23,24 @@ const SFMT_PARITY2: u32 = 0x00000000;
 const SFMT_PARITY3: u32 = 0x00000000;
 const SFMT_PARITY4: u32 = 0x13c9e684;
 
-fn mm_recursion(a: i8x16, b: i32x4, c: i8x16, d: i32x4) -> i32x4 {
+fn mm_recursion(a: i32x4, b: i32x4, c: i32x4, d: i32x4) -> i32x4 {
     unsafe {
+        use std::mem::transmute;
+        use std::arch::x86_64::*;
+        let a = transmute::<i32x4, __m128i>(a);
+        let b = transmute::<i32x4, __m128i>(b);
+        let c = transmute::<i32x4, __m128i>(c);
+        let d = transmute::<i32x4, __m128i>(d);
+        let mask = transmute::<u32x4, __m128i>(SFMT_MASK);
         let y = _mm_srli_epi32(b, SFMT_SR1);
         let z = _mm_srli_si128(c, SFMT_SR2);
         let v = _mm_slli_epi32(d, SFMT_SL1);
         let z = _mm_xor_si128(z, a);
-        let z = _mm_xor_si128(z, v.into());
+        let z = _mm_xor_si128(z, v);
         let x = _mm_slli_si128(a, SFMT_SL2);
-        let y = _mm_and_si128(y.into(), SFMT_MASK.into());
+        let y = _mm_and_si128(y, mask);
         let z = _mm_xor_si128(z, x);
-        _mm_xor_si128(z, y).into()
+        transmute(_mm_xor_si128(z, y))
     }
 }
 
@@ -43,12 +49,12 @@ pub fn sfmt_gen_rand_all(sfmt: &mut SFMT) {
     let mut r1 = st[SFMT_N - 2];
     let mut r2 = st[SFMT_N - 1];
     for i in 0..(SFMT_N - SFMT_POS1) {
-        st[i] = mm_recursion(st[i].into(), st[i + SFMT_POS1], r1.into(), r2);
+        st[i] = mm_recursion(st[i], st[i + SFMT_POS1], r1, r2);
         r1 = r2;
         r2 = st[i];
     }
     for i in (SFMT_N - SFMT_POS1)..SFMT_N {
-        st[i] = mm_recursion(st[i].into(), st[i + SFMT_POS1 - SFMT_N], r1.into(), r2);
+        st[i] = mm_recursion(st[i], st[i + SFMT_POS1 - SFMT_N], r1, r2);
         r1 = r2;
         r2 = st[i];
     }
