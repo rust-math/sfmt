@@ -7,3 +7,4 @@ cache: cargo
 
 script:
   - cargo test
+  - cargo bench

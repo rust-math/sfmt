@@ -1,12 +1,12 @@
 #![feature(test)]
 
 extern crate rand;
-extern crate rsfmt;
+extern crate sfmt;
 extern crate test;
 
 use test::Bencher;
 use rand::*;
-use rsfmt::SFMT;
+use sfmt::SFMT;
 
 macro_rules! def_bench { ($name:ident, $t:ty, $rng:expr) => {
 #[bench]

@@ -1,7 +1,7 @@
 extern crate rand;
-extern crate rsfmt;
+extern crate sfmt;
 
-use rsfmt::*;
+use sfmt::*;
 use rand::Rng;
 use std::io::Read;
 
