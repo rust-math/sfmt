@@ -1,3 +1,8 @@
+//!  Rust implementation of [SIMD-oriented Fast Mersenne Twister (SFMT)] using [stable SIMD]
+//!
+//! [SIMD-oriented Fast Mersenne Twister (SFMT)]: http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/
+//! [stable SIMD]: https://github.com/rust-lang/rfcs/blob/master/text/2325-stable-simd.md
+
 #![feature(stdsimd)]
 
 extern crate rand;
@@ -7,15 +12,19 @@ mod sfmt;
 use rand::Rng;
 use std::simd::*;
 
+/// State of SFMT
+///
+/// This struct implements random number generation through `rand::Rng`.
 #[derive(Clone)]
 pub struct SFMT {
     /// the 128-bit internal state array
-    pub state: [i32x4; sfmt::SFMT_N],
+    state: [i32x4; sfmt::SFMT_N],
     /// index counter to the 32-bit internal state array
-    pub idx: usize,
+    idx: usize,
 }
 
 impl SFMT {
+    /// Create a new state from a seed.
     pub fn new(seed: u32) -> Self {
         let mut sfmt = SFMT {
             state: [i32x4::new(0, 0, 0, 0); sfmt::SFMT_N],
