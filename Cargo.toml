@@ -1,8 +1,9 @@
 [package]
 name = "sfmt"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Toshiki Teramura <toshiki.teramura@gmail.com>"]
-description = "Rust wrapper of SFMT"
+
+description = "Rust implementation of SIMD-oriented Fast Mersenne Twister (SFMT)"
 documentation = "https://docs.rs/sfmt/"
 repository = "https://github.com/termoshtt/rust-sfmt"
 keywords = ["random", "rng"]
@@ -11,7 +12,3 @@ license = "MIT"
 
 [dependencies]
 rand = "0.4"
-
-[dependencies.sfmt-sys]
-path = "sfmt-sys"
-version = "0.1.0"
