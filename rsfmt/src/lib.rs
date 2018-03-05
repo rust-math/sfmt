@@ -1,10 +1,11 @@
+#![feature(stdsimd)]
+
 extern crate rand;
-extern crate stdsimd;
 
 mod sfmt;
 
 use rand::Rng;
-use stdsimd::simd::*;
+use std::simd::*;
 
 #[derive(Clone)]
 pub struct SFMT {
