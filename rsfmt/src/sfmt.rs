@@ -1,7 +1,6 @@
 //! Rust re-implementation of SFMT
 
-use std::simd::*;
-use std::arch::x86_64::*;
+use std::simd::{i32x4, u32x4};
 
 use super::SFMT;
 
@@ -27,6 +26,7 @@ const SFMT_PARITY4: u32 = 0x13c9e684;
 fn mm_recursion(a: i32x4, b: i32x4, c: i32x4, d: i32x4) -> i32x4 {
     unsafe {
         use std::mem::transmute;
+        use std::arch::x86_64::*;
         let a = transmute::<i32x4, __m128i>(a);
         let b = transmute::<i32x4, __m128i>(b);
         let c = transmute::<i32x4, __m128i>(c);
