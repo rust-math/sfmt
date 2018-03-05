@@ -25,10 +25,18 @@ impl SFMT {
         sfmt
     }
 
-    fn pop(&mut self) -> u32 {
+    fn pop32(&mut self) -> u32 {
         let val = self.state[self.idx / 4].extract((self.idx % 4) as u32) as u32;
         self.idx += 1;
         val
+    }
+
+    fn pop64(&mut self) -> u64 {
+        assert!(self.idx % 2 == 0);
+        let v: u64x2 = self.state[self.idx / 4].into();
+        let idx = (self.idx % 4) / 2;
+        self.idx += 2;
+        v.extract(idx as u32)
     }
 
     fn gen_all(&mut self) {
@@ -42,6 +50,13 @@ impl Rng for SFMT {
         if self.idx >= sfmt::SFMT_N32 {
             self.gen_all();
         }
-        self.pop()
+        self.pop32()
+    }
+
+    fn next_u64(&mut self) -> u64 {
+        if self.idx >= sfmt::SFMT_N32 {
+            self.gen_all();
+        }
+        self.pop64()
     }
 }
