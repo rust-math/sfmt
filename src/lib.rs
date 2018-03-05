@@ -1,75 +1,62 @@
+#![feature(stdsimd)]
+
 extern crate rand;
-extern crate sfmt_sys as ffi;
+
+mod sfmt;
 
 use rand::Rng;
+use std::simd::*;
 
-pub struct SFMT(ffi::SFMT);
-
-const SFMT_MEXP: i32 = 19937;
-const SFMT_N: i32 = SFMT_MEXP / 128 + 1;
-const SFMT_N32: i32 = SFMT_N * 4;
+#[derive(Clone)]
+pub struct SFMT {
+    /// the 128-bit internal state array
+    pub state: [i32x4; sfmt::SFMT_N],
+    /// index counter to the 32-bit internal state array
+    pub idx: usize,
+}
 
 impl SFMT {
-    fn empty() -> Self {
-        let sfmt = ffi::SFMT {
-            state: [ffi::w128 { u64: [0, 0] }; 156],
+    pub fn new(seed: u32) -> Self {
+        let mut sfmt = SFMT {
+            state: [i32x4::new(0, 0, 0, 0); sfmt::SFMT_N],
             idx: 0,
         };
-        SFMT(sfmt)
+        sfmt::sfmt_init_gen_rand(&mut sfmt, seed);
+        sfmt
+    }
+
+    fn pop32(&mut self) -> u32 {
+        let val = self.state[self.idx / 4].extract((self.idx % 4) as u32) as u32;
+        self.idx += 1;
+        val
+    }
+
+    fn pop64(&mut self) -> u64 {
+        assert!(self.idx % 2 == 0);
+        let v: u64x2 = self.state[self.idx / 4].into();
+        let idx = (self.idx % 4) / 2;
+        self.idx += 2;
+        v.extract(idx as u32)
     }
 
     fn gen_all(&mut self) {
-        unsafe { ffi::sfmt_gen_rand_all(&mut self.0 as *mut _) };
-    }
-
-    fn get(&self) -> u32 {
-        unsafe {
-            let ptr = &self.0.state[0].u[0] as *const u32;
-            *ptr.offset(self.0.idx as isize)
-        }
-    }
-
-    pub fn new(seed: u32) -> Self {
-        let mut sfmt = Self::empty();
-        unsafe { ffi::sfmt_init_gen_rand(&mut sfmt.0 as *mut _, seed) };
-        sfmt
+        sfmt::sfmt_gen_rand_all(self);
+        self.idx = 0;
     }
 }
 
 impl Rng for SFMT {
     fn next_u32(&mut self) -> u32 {
-        if self.0.idx >= SFMT_N32 {
+        if self.idx >= sfmt::SFMT_N32 {
             self.gen_all();
-            self.0.idx = 0;
         }
-        let u = self.get();
-        self.0.idx += 1;
-        u
-    }
-}
-
-#[cfg(test)]
-mod test {
-    use super::*;
-    use std::io::Read;
-
-    fn read_answer() -> Result<Vec<u32>, std::io::Error> {
-        let mut f = std::fs::File::open("SFMT_19937.txt")?;
-        let mut buf = String::new();
-        f.read_to_string(&mut buf)?;
-        Ok(buf.split(" ")
-            .map(|s| s.trim().parse().expect("Failed to parse into u32"))
-            .collect())
+        self.pop32()
     }
 
-    #[test]
-    fn gen_u32() {
-        let ans = read_answer().expect("Failed to load answers");
-        let mut sfmt = SFMT::new(1234);
-        for (t, val) in ans.into_iter().enumerate() {
-            let r = sfmt.next_u32();
-            println!("[{}] gen = {}, ans = {}", t, r, val);
-            assert_eq!(r, val);
+    fn next_u64(&mut self) -> u64 {
+        if self.idx >= sfmt::SFMT_N32 {
+            self.gen_all();
         }
+        self.pop64()
     }
 }
