@@ -1,12 +1,12 @@
 
 #define SFMT_MEXP 19937
-#include "SFMT.h"
+#include "SFMT-src-1.5.1/SFMT.h"
 #include <stdio.h>
 
 static const w128_t sse2_param_mask = {
     {SFMT_MSK1, SFMT_MSK2, SFMT_MSK3, SFMT_MSK4}};
 
-#include "SFMT-sse2.h"
+#include "SFMT-src-1.5.1/SFMT-sse2.h"
 
 void print128(__m128i var) {
   uint32_t *val = (uint32_t *)&var;

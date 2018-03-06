@@ -1,6 +1,6 @@
 
 #define SFMT_MEXP 19937
-#include "SFMT.h"
+#include "SFMT-src-1.5.1/SFMT.h"
 
 void print128(__m128i var) {
   uint32_t *val = (uint32_t *)&var;
