@@ -8,9 +8,12 @@
 extern crate rand;
 
 mod sfmt;
+mod thread_rng;
 
 use rand::Rng;
 use std::simd::*;
+
+pub use thread_rng::{thread_rng, ThreadRng};
 
 /// State of SFMT
 ///
