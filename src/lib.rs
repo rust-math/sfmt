@@ -2,6 +2,15 @@
 //!
 //! [SIMD-oriented Fast Mersenne Twister (SFMT)]: http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/
 //! [stable SIMD]: https://github.com/rust-lang/rfcs/blob/master/text/2325-stable-simd.md
+//!
+//! ```
+//! # extern crate rand;
+//! # extern crate sfmt;
+//! use rand::Rng;
+//! let mut rng = sfmt::SFMT::new(1234);  // seed
+//! let r = rng.gen::<u32>();
+//! println!("random u32 number = {}", r);
+//! ```
 
 #![feature(stdsimd)]
 
