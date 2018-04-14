@@ -25,8 +25,8 @@ const SFMT_PARITY4: u32 = 0x13c9e684;
 
 fn mm_recursion(a: i32x4, b: i32x4, c: i32x4, d: i32x4) -> i32x4 {
     unsafe {
-        use std::mem::transmute;
         use std::arch::x86_64::*;
+        use std::mem::transmute;
         let a = transmute::<i32x4, __m128i>(a);
         let b = transmute::<i32x4, __m128i>(b);
         let c = transmute::<i32x4, __m128i>(c);
@@ -65,7 +65,7 @@ pub fn period_certification(sfmt: &mut SFMT) {
     let st = &mut sfmt.state[0];
     let parity = [SFMT_PARITY1, SFMT_PARITY2, SFMT_PARITY3, SFMT_PARITY4];
     for i in 0..4 {
-        inner ^= st.extract(i as u32) as u32 & parity[i];
+        inner ^= st.extract(i) as u32 & parity[i];
     }
     for i in [16, 8, 4, 2, 1].iter() {
         inner ^= inner >> i;
@@ -78,8 +78,8 @@ pub fn period_certification(sfmt: &mut SFMT) {
         let mut work = 1_u32;
         for _ in 0..32 {
             if (work & parity[i]) != 0 {
-                let val = st.extract(i as u32) as u32 ^ work;
-                let val = st.replace(i as u32, val as i32);
+                let val = st.extract(i) as u32 ^ work;
+                let val = st.replace(i, val as i32);
                 ::std::mem::replace(st, val);
                 return;
             }
