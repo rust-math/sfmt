@@ -1,6 +1,6 @@
 [package]
 name = "sfmt"
-version = "0.2.3"
+version = "0.2.4-alpha.0"
 authors = ["Toshiki Teramura <toshiki.teramura@gmail.com>"]
 
 description = "Rust implementation of SIMD-oriented Fast Mersenne Twister (SFMT)"
