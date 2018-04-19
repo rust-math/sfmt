@@ -9,7 +9,6 @@
 //! use rand::Rng;
 //! let mut rng = sfmt::SFMT::new(1234);  // seed
 //! let r = rng.gen::<u32>();
-//! let r = rng.gen::<u64>();
 //! println!("random u32 number = {}", r);
 //! ```
 
@@ -79,8 +78,26 @@ impl Rng for SFMT {
 
     fn next_u64(&mut self) -> u64 {
         if self.idx >= sfmt::SFMT_N32 - 1 {
+            // drop last u32 if idx == N32-1
             self.gen_all();
         }
         self.pop64()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn random() {
+        let mut rng = SFMT::new(1234);
+        for _ in 0..sfmt::SFMT_N * 20 {
+            // Generate many random numbers to test the overwrap
+            let r = rng.gen::<u64>();
+            if r % 2 == 0 {
+                let _r = rng.gen::<u32>();
+            } // shift SFMT.idx randomly
+        }
     }
 }
