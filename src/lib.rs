@@ -9,6 +9,7 @@
 //! use rand::Rng;
 //! let mut rng = sfmt::SFMT::new(1234);  // seed
 //! let r = rng.gen::<u32>();
+//! let r = rng.gen::<u64>();
 //! println!("random u32 number = {}", r);
 //! ```
 
@@ -53,11 +54,13 @@ impl SFMT {
     }
 
     fn pop64(&mut self) -> u64 {
-        assert!(self.idx % 2 == 0);
-        let v: u64x2 = unsafe { ::std::mem::transmute(self.state[self.idx / 4]) };
-        let idx = (self.idx % 4) / 2;
+        let p = self.state.as_ptr() as *const u32;
+        let val = unsafe {
+            let p = p.offset(self.idx as isize);
+            *(p as *const u64) // reinterpret cast [u32; 2] -> u64
+        };
         self.idx += 2;
-        v.extract(idx)
+        val
     }
 
     fn gen_all(&mut self) {
@@ -75,7 +78,7 @@ impl Rng for SFMT {
     }
 
     fn next_u64(&mut self) -> u64 {
-        if self.idx >= sfmt::SFMT_N32 {
+        if self.idx >= sfmt::SFMT_N32 - 1 {
             self.gen_all();
         }
         self.pop64()
