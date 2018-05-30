@@ -15,11 +15,12 @@
 #![feature(stdsimd)]
 
 extern crate rand;
+extern crate rand_core;
 
 mod sfmt;
 mod thread_rng;
 
-use rand::Rng;
+use rand_core::{impls, Error, RngCore};
 use std::simd::*;
 
 pub use thread_rng::{thread_rng, ThreadRng};
@@ -68,7 +69,7 @@ impl SFMT {
     }
 }
 
-impl Rng for SFMT {
+impl RngCore for SFMT {
     fn next_u32(&mut self) -> u32 {
         if self.idx >= sfmt::SFMT_N32 {
             self.gen_all();
@@ -82,6 +83,14 @@ impl Rng for SFMT {
             self.gen_all();
         }
         self.pop64()
+    }
+
+    fn fill_bytes(&mut self, dest: &mut [u8]) {
+        impls::fill_bytes_via_next(self, dest)
+    }
+
+    fn try_fill_bytes(&mut self, dest: &mut [u8]) -> Result<(), Error> {
+        Ok(self.fill_bytes(dest))
     }
 }
 
