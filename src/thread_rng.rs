@@ -2,15 +2,14 @@
 
 use super::SFMT;
 
-use rand::Rng;
+use rand::FromEntropy;
 use rand_core::{Error, RngCore};
 use std::cell::RefCell;
 use std::rc::Rc;
 
 thread_local!(
     static THREAD_RNG_KEY: Rc<RefCell<SFMT>> = {
-        let mut rng = ::rand::thread_rng();
-        Rc::new(RefCell::new(SFMT::new(rng.gen())))
+        Rc::new(RefCell::new(SFMT::from_entropy()))
     }
 );
 
