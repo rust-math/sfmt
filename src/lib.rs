@@ -97,6 +97,7 @@ impl RngCore for SFMT {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use rand::Rng;
 
     #[test]
     fn random() {

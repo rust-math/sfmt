@@ -1,8 +1,8 @@
 extern crate rand;
 extern crate sfmt;
 
+use rand::RngCore;
 use sfmt::*;
-use rand::Rng;
 use std::io::Read;
 
 fn read_answer() -> Result<Vec<u32>, std::io::Error> {
