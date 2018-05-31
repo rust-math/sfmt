@@ -1,8 +1,8 @@
 extern crate rand;
 extern crate sfmt;
 
+use rand::{RngCore, SeedableRng};
 use sfmt::*;
-use rand::Rng;
 use std::io::Read;
 
 fn read_answer() -> Result<Vec<u32>, std::io::Error> {
@@ -17,7 +17,9 @@ fn read_answer() -> Result<Vec<u32>, std::io::Error> {
 #[test]
 fn gen_u32() {
     let ans = read_answer().expect("Failed to load answers");
-    let mut sfmt = SFMT::new(1234);
+    let seed: u32 = 1234;
+    let seed = unsafe { *(&seed as *const u32 as *const [u8; 4]) };
+    let mut sfmt = SFMT::from_seed(seed); // 1234 = 0x4D2
     for (t, val) in ans.into_iter().enumerate() {
         let r = sfmt.next_u32();
         println!("[{}] gen = {}, ans = {}", t, r, val);

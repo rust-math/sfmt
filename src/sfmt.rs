@@ -117,6 +117,7 @@ pub fn sfmt_init_gen_rand(sfmt: &mut SFMT, seed: u32) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use rand::SeedableRng;
     use std::{fs, io, io::BufRead};
 
     fn read_answer(filename: &str) -> Result<Vec<i32x4>, io::Error> {
@@ -134,7 +135,9 @@ mod tests {
 
     #[test]
     fn test_init() {
-        let sfmt = SFMT::new(1234);
+        let seed: u32 = 1234;
+        let seed = unsafe { *(&seed as *const u32 as *const [u8; 4]) };
+        let sfmt = SFMT::from_seed(seed);
         let ans = read_answer("check/init1234.txt").unwrap();
         for (v, a) in sfmt.state.iter().zip(ans.iter()) {
             println!("v = {:?}", v);

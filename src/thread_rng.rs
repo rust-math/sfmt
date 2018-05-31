@@ -2,14 +2,14 @@
 
 use super::SFMT;
 
-use std::rc::Rc;
+use rand::FromEntropy;
+use rand_core::{Error, RngCore};
 use std::cell::RefCell;
-use rand::{self, Rng};
+use std::rc::Rc;
 
 thread_local!(
     static THREAD_RNG_KEY: Rc<RefCell<SFMT>> = {
-        let mut rng = rand::thread_rng();
-        Rc::new(RefCell::new(SFMT::new(rng.gen())))
+        Rc::new(RefCell::new(SFMT::from_entropy()))
     }
 );
 
@@ -38,12 +38,20 @@ pub fn thread_rng() -> ThreadRng {
     }
 }
 
-impl Rng for ThreadRng {
+impl RngCore for ThreadRng {
     fn next_u32(&mut self) -> u32 {
         self.rng.borrow_mut().next_u32()
     }
 
     fn next_u64(&mut self) -> u64 {
         self.rng.borrow_mut().next_u64()
+    }
+
+    fn fill_bytes(&mut self, dest: &mut [u8]) {
+        self.rng.borrow_mut().fill_bytes(dest)
+    }
+
+    fn try_fill_bytes(&mut self, dest: &mut [u8]) -> Result<(), Error> {
+        self.rng.borrow_mut().try_fill_bytes(dest)
     }
 }
