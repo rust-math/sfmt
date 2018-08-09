@@ -13,3 +13,4 @@ license = "MIT"
 [dependencies]
 rand = "0.5"
 rand_core = "0.2"
+packed_simd = "0.1"

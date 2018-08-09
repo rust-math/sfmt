@@ -12,16 +12,15 @@
 //! println!("random u32 number = {}", r);
 //! ```
 
-#![feature(stdsimd)]
-
+extern crate packed_simd;
 extern crate rand;
 extern crate rand_core;
 
 mod sfmt;
 mod thread_rng;
 
+use packed_simd::*;
 use rand_core::{impls, Error, RngCore, SeedableRng};
-use std::simd::*;
 
 pub use thread_rng::{thread_rng, ThreadRng};
 
