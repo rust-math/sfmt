@@ -1,6 +1,6 @@
 //! Rust re-implementation of SFMT
 
-use std::simd::{i32x4, u32x4};
+use packed_simd::{i32x4, u32x4};
 
 use super::SFMT;
 
