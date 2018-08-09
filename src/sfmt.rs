@@ -124,13 +124,13 @@ mod tests {
         let f = io::BufReader::new(fs::File::open(filename)?);
         Ok(f.lines()
             .map(|line| {
-                let vals: Vec<_> = line.unwrap()
+                let vals: Vec<_> = line
+                    .unwrap()
                     .split(" ")
                     .map(|s| s.trim().parse().unwrap())
                     .collect();
                 i32x4::new(vals[0], vals[1], vals[2], vals[3])
-            })
-            .collect())
+            }).collect())
     }
 
     #[test]
