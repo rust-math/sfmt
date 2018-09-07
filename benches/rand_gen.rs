@@ -13,7 +13,11 @@ macro_rules! def_bench {
         #[bench]
         fn $name(b: &mut Bencher) {
             let mut rng = $rng;
-            b.iter(|| rng.gen::<$t>());
+            b.iter(|| {
+                for _ in 0..100 {
+                    let _rng = rng.gen::<$t>();
+                }
+            });
         }
     };
 } // def_bench!
