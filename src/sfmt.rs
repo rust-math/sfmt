@@ -1,11 +1,7 @@
 //! Rust re-implementation of SFMT
 
 use super::*;
-
-#[cfg(target_arch = "x86")]
-use std::arch::x86::*;
-#[cfg(target_arch = "x86_64")]
-use std::arch::x86_64::*;
+use crate::packed::*;
 
 const SFMT_MEXP: usize = 19937;
 pub const SFMT_N: usize = SFMT_MEXP / 128 + 1; // = 156
@@ -25,7 +21,12 @@ const SFMT_PARITY2: u32 = 0x00000000;
 const SFMT_PARITY3: u32 = 0x00000000;
 const SFMT_PARITY4: u32 = 0x13c9e684;
 
-fn mm_recursion(a: __m128i, b: __m128i, c: __m128i, d: __m128i) -> __m128i {
+fn mm_recursion(a: i32x4, b: i32x4, c: i32x4, d: i32x4) -> i32x4 {
+    #[cfg(target_arch = "x86")]
+    use std::arch::x86::*;
+    #[cfg(target_arch = "x86_64")]
+    use std::arch::x86_64::*;
+
     unsafe {
         let mask = new(SFMT_MSK1, SFMT_MSK2, SFMT_MSK3, SFMT_MSK4);
         let y = _mm_srli_epi32(b, SFMT_SR1);
@@ -90,7 +91,7 @@ fn iterate(pre: i32, i: i32) -> i32 {
     (Wrapping(1812433253) * (pre ^ (pre >> 30)) + i).0 as i32
 }
 
-fn map(a: i32, idx: i32) -> (__m128i, i32) {
+fn map(a: i32, idx: i32) -> (i32x4, i32) {
     let b = iterate(a, 4 * idx + 1);
     let c = iterate(b, 4 * idx + 2);
     let d = iterate(c, 4 * idx + 3);
@@ -115,11 +116,11 @@ mod tests {
     use rand::SeedableRng;
     use std::{fs, io, io::BufRead};
 
-    fn split(a: __m128i) -> (u32, u32, u32, u32) {
+    fn split(a: i32x4) -> (u32, u32, u32, u32) {
         (extract(a, 0), extract(a, 1), extract(a, 2), extract(a, 3))
     }
 
-    fn read_answer(filename: &str) -> Result<Vec<__m128i>, io::Error> {
+    fn read_answer(filename: &str) -> Result<Vec<i32x4>, io::Error> {
         let f = io::BufReader::new(fs::File::open(filename)?);
         Ok(f.lines()
             .map(|line| {

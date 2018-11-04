@@ -10,17 +10,14 @@
 //! println!("random u32 number = {}", r);
 //! ```
 
+mod packed;
 mod sfmt;
 mod thread_rng;
 
 use rand_core::{impls, Error, RngCore, SeedableRng};
 
-pub use crate::thread_rng::{thread_rng, ThreadRng};
-
-#[cfg(target_arch = "x86")]
-use std::arch::x86::*;
-#[cfg(target_arch = "x86_64")]
-use std::arch::x86_64::*;
+use self::packed::*;
+pub use self::thread_rng::{thread_rng, ThreadRng};
 
 /// State of SFMT
 ///
@@ -28,38 +25,9 @@ use std::arch::x86_64::*;
 #[derive(Clone)]
 pub struct SFMT {
     /// the 128-bit internal state array
-    state: [__m128i; sfmt::SFMT_N],
+    state: [i32x4; sfmt::SFMT_N],
     /// index counter to the 32-bit internal state array
     idx: usize,
-}
-
-fn new(e0: i32, e1: i32, e2: i32, e3: i32) -> __m128i {
-    unsafe { _mm_set_epi32(e3, e2, e1, e0) }
-}
-
-fn extract(vals: __m128i, imm: usize) -> u32 {
-    unsafe {
-        match imm {
-            0 => _mm_extract_epi32(vals, 0) as u32,
-            1 => _mm_extract_epi32(vals, 1) as u32,
-            2 => _mm_extract_epi32(vals, 2) as u32,
-            3 => _mm_extract_epi32(vals, 3) as u32,
-            _ => unreachable!(),
-        }
-    }
-}
-
-fn insert(vals: &mut __m128i, val: i32, imm: usize) {
-    let updated = unsafe {
-        match imm {
-            0 => _mm_insert_epi32(*vals, val, 0),
-            1 => _mm_insert_epi32(*vals, val, 1),
-            2 => _mm_insert_epi32(*vals, val, 2),
-            3 => _mm_insert_epi32(*vals, val, 3),
-            _ => unreachable!(),
-        }
-    };
-    ::std::mem::replace(vals, updated);
 }
 
 impl SFMT {
@@ -90,7 +58,7 @@ impl SeedableRng for SFMT {
 
     fn from_seed(seed: [u8; 4]) -> Self {
         let mut sfmt = SFMT {
-            state: unsafe { [_mm_setzero_si128(); sfmt::SFMT_N] },
+            state:  [zero(); sfmt::SFMT_N],
             idx: 0,
         };
         let seed = unsafe { *(seed.as_ptr() as *const u32) };
