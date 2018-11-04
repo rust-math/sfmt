@@ -17,20 +17,50 @@ use rand_core::{impls, Error, RngCore, SeedableRng};
 
 pub use crate::thread_rng::{thread_rng, ThreadRng};
 
+#[cfg(target_arch = "x86")]
+use std::arch::x86::*;
+#[cfg(target_arch = "x86_64")]
+use std::arch::x86_64::*;
+
 /// State of SFMT
 ///
 /// This struct implements random number generation through `rand::Rng`.
 #[derive(Clone)]
 pub struct SFMT {
     /// the 128-bit internal state array
-    state: [i32x4; sfmt::SFMT_N],
+    state: [__m128i; sfmt::SFMT_N],
     /// index counter to the 32-bit internal state array
     idx: usize,
 }
 
+fn extract(vals: __m128i, imm: usize) -> u32 {
+    unsafe {
+        match imm {
+            0 => _mm_extract_epi32(vals, 0) as u32,
+            1 => _mm_extract_epi32(vals, 1) as u32,
+            2 => _mm_extract_epi32(vals, 2) as u32,
+            3 => _mm_extract_epi32(vals, 3) as u32,
+            _ => unreachable!(),
+        }
+    }
+}
+
+fn insert(vals: &mut __m128i, val: i32, imm: usize) {
+    let updated = unsafe {
+        match imm {
+            0 => _mm_insert_epi32(*vals, val, 0),
+            1 => _mm_insert_epi32(*vals, val, 1),
+            2 => _mm_insert_epi32(*vals, val, 2),
+            3 => _mm_insert_epi32(*vals, val, 3),
+            _ => unreachable!(),
+        }
+    };
+    ::std::mem::replace(vals, updated);
+}
+
 impl SFMT {
     fn pop32(&mut self) -> u32 {
-        let val = self.state[self.idx / 4].extract(self.idx % 4) as u32;
+        let val = extract(self.state[self.idx / 4], self.idx % 4);
         self.idx += 1;
         val
     }
@@ -56,7 +86,7 @@ impl SeedableRng for SFMT {
 
     fn from_seed(seed: [u8; 4]) -> Self {
         let mut sfmt = SFMT {
-            state: [i32x4::new(0, 0, 0, 0); sfmt::SFMT_N],
+            state: unsafe { [_mm_setzero_si128(); sfmt::SFMT_N] },
             idx: 0,
         };
         let seed = unsafe { *(seed.as_ptr() as *const u32) };
