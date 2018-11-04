@@ -4,25 +4,20 @@
 //! [stable SIMD]: https://github.com/rust-lang/rfcs/blob/master/text/2325-stable-simd.md
 //!
 //! ```
-//! # extern crate rand;
-//! # extern crate sfmt;
 //! use rand::{Rng, FromEntropy};
 //! let mut rng = sfmt::SFMT::from_entropy();
 //! let r = rng.gen::<u32>();
 //! println!("random u32 number = {}", r);
 //! ```
 
-extern crate packed_simd;
-extern crate rand;
-extern crate rand_core;
-
+mod packed;
 mod sfmt;
 mod thread_rng;
 
-use packed_simd::*;
 use rand_core::{impls, Error, RngCore, SeedableRng};
 
-pub use thread_rng::{thread_rng, ThreadRng};
+use self::packed::*;
+pub use self::thread_rng::{thread_rng, ThreadRng};
 
 /// State of SFMT
 ///
@@ -37,7 +32,7 @@ pub struct SFMT {
 
 impl SFMT {
     fn pop32(&mut self) -> u32 {
-        let val = self.state[self.idx / 4].extract(self.idx % 4) as u32;
+        let val = extract(self.state[self.idx / 4], self.idx % 4);
         self.idx += 1;
         val
     }
@@ -63,7 +58,7 @@ impl SeedableRng for SFMT {
 
     fn from_seed(seed: [u8; 4]) -> Self {
         let mut sfmt = SFMT {
-            state: [i32x4::new(0, 0, 0, 0); sfmt::SFMT_N],
+            state:  [zero(); sfmt::SFMT_N],
             idx: 0,
         };
         let seed = unsafe { *(seed.as_ptr() as *const u32) };

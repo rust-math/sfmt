@@ -1,10 +1,14 @@
 language: rust
+cache: cargo
 
 rust:
+  - beta
   - nightly
 
-cache: cargo
+os:
+  - windows
+  - linux
+  - osx
 
 script:
   - cargo test
-  - cargo bench
