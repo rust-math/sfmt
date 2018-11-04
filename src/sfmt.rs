@@ -27,7 +27,7 @@ const SFMT_PARITY4: u32 = 0x13c9e684;
 
 fn mm_recursion(a: __m128i, b: __m128i, c: __m128i, d: __m128i) -> __m128i {
     unsafe {
-        let mask = _mm_set_epi32(SFMT_MSK1, SFMT_MSK2, SFMT_MSK3, SFMT_MSK4);
+        let mask = new(SFMT_MSK1, SFMT_MSK2, SFMT_MSK3, SFMT_MSK4);
         let y = _mm_srli_epi32(b, SFMT_SR1);
         let z = _mm_srli_si128(c, SFMT_SR2);
         let v = _mm_slli_epi32(d, SFMT_SL1);
@@ -95,7 +95,7 @@ fn map(a: i32, idx: i32) -> (__m128i, i32) {
     let c = iterate(b, 4 * idx + 2);
     let d = iterate(c, 4 * idx + 3);
     let a2 = iterate(d, 4 * idx + 4);
-    (unsafe { _mm_set_epi32(a, b, c, d) }, a2)
+    (new(a, b, c, d), a2)
 }
 
 pub fn sfmt_init_gen_rand(sfmt: &mut SFMT, seed: u32) {
@@ -128,7 +128,7 @@ mod tests {
                     .split(" ")
                     .map(|s| s.trim().parse().unwrap())
                     .collect();
-                unsafe { _mm_set_epi32(vals[0], vals[1], vals[2], vals[3]) }
+                new(vals[0], vals[1], vals[2], vals[3])
             }).collect())
     }
 
@@ -145,18 +145,16 @@ mod tests {
 
     #[test]
     fn test_mm_recursion() {
-        unsafe {
-            let a = _mm_set_epi32(1, 2, 3, 4);
-            let z = mm_recursion(a, a, a, a);
-            let zc = _mm_set_epi32(33816833, 50856450, 67896067, 1049604); // calculated by C code
-            assert_eq!(split(z), split(zc));
+        let a = new(1, 2, 3, 4);
+        let z = mm_recursion(a, a, a, a);
+        let zc = new(33816833, 50856450, 67896067, 1049604); // calculated by C code
+        assert_eq!(split(z), split(zc));
 
-            let b = _mm_set_epi32(431, 232, 83, 14);
-            let c = _mm_set_epi32(213, 22, 93, 234);
-            let d = _mm_set_epi32(112, 882, 23, 124);
-            let z = mm_recursion(a, b, c, d);
-            let zc = _mm_set_epi32(398459137, 1355284994, -363068669, 32506884); // calculated by C code
-            assert_eq!(split(z), split(zc));
-        }
+        let b = new(431, 232, 83, 14);
+        let c = new(213, 22, 93, 234);
+        let d = new(112, 882, 23, 124);
+        let z = mm_recursion(a, b, c, d);
+        let zc = new(398459137, 1355284994, -363068669, 32506884); // calculated by C code
+        assert_eq!(split(z), split(zc));
     }
 }

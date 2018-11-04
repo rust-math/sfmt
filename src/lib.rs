@@ -33,6 +33,10 @@ pub struct SFMT {
     idx: usize,
 }
 
+fn new(e0: i32, e1: i32, e2: i32, e3: i32) -> __m128i {
+    unsafe { _mm_set_epi32(e3, e2, e1, e0) }
+}
+
 fn extract(vals: __m128i, imm: usize) -> u32 {
     unsafe {
         match imm {
