@@ -115,6 +115,10 @@ mod tests {
     use rand::SeedableRng;
     use std::{fs, io, io::BufRead};
 
+    fn split(a: __m128i) -> (u32, u32, u32, u32) {
+        (extract(a, 0), extract(a, 1), extract(a, 2), extract(a, 3))
+    }
+
     fn read_answer(filename: &str) -> Result<Vec<__m128i>, io::Error> {
         let f = io::BufReader::new(fs::File::open(filename)?);
         Ok(f.lines()
@@ -135,11 +139,7 @@ mod tests {
         let sfmt = SFMT::from_seed(seed);
         let ans = read_answer("check/init1234.txt").unwrap();
         for (v, a) in sfmt.state.iter().zip(ans.iter()) {
-            println!("v = {:?}", v);
-            println!("a = {:?}", a);
-            for i in 0..4 {
-                assert_eq!(extract(*v, i), extract(*a, i));
-            }
+            assert_eq!(split(*v), split(*a));
         }
     }
 
@@ -147,19 +147,16 @@ mod tests {
     fn test_mm_recursion() {
         unsafe {
             let a = _mm_set_epi32(1, 2, 3, 4);
+            let z = mm_recursion(a, a, a, a);
+            let zc = _mm_set_epi32(33816833, 50856450, 67896067, 1049604); // calculated by C code
+            assert_eq!(split(z), split(zc));
+
             let b = _mm_set_epi32(431, 232, 83, 14);
             let c = _mm_set_epi32(213, 22, 93, 234);
             let d = _mm_set_epi32(112, 882, 23, 124);
-            let z = mm_recursion(a.into(), a, a.into(), a);
-            let zc = _mm_set_epi32(33816833, 50856450, 67896067, 1049604); // calculated by C code
-            for i in 0..4 {
-                assert_eq!(extract(z, i), extract(zc, i));
-            }
-            let z = mm_recursion(a.into(), b, c.into(), d);
+            let z = mm_recursion(a, b, c, d);
             let zc = _mm_set_epi32(398459137, 1355284994, -363068669, 32506884); // calculated by C code
-            for i in 0..4 {
-                assert_eq!(extract(z, i), extract(zc, i));
-            }
+            assert_eq!(split(z), split(zc));
         }
     }
 }
