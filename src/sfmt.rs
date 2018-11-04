@@ -27,8 +27,6 @@ const SFMT_PARITY4: u32 = 0x13c9e684;
 
 fn mm_recursion(a: __m128i, b: __m128i, c: __m128i, d: __m128i) -> __m128i {
     unsafe {
-        use std::arch::x86_64::*;
-        use std::mem::transmute;
         let mask = _mm_set_epi32(SFMT_MSK1, SFMT_MSK2, SFMT_MSK3, SFMT_MSK4);
         let y = _mm_srli_epi32(b, SFMT_SR1);
         let z = _mm_srli_si128(c, SFMT_SR2);
@@ -38,7 +36,7 @@ fn mm_recursion(a: __m128i, b: __m128i, c: __m128i, d: __m128i) -> __m128i {
         let x = _mm_slli_si128(a, SFMT_SL2);
         let y = _mm_and_si128(y, mask);
         let z = _mm_xor_si128(z, x);
-        transmute(_mm_xor_si128(z, y))
+        _mm_xor_si128(z, y)
     }
 }
 
@@ -60,10 +58,10 @@ pub fn sfmt_gen_rand_all(sfmt: &mut SFMT) {
 
 pub fn period_certification(sfmt: &mut SFMT) {
     let mut inner = 0_u32;
-    let mut st = sfmt.state[0];
+    let st = &mut sfmt.state[0];
     let parity = [SFMT_PARITY1, SFMT_PARITY2, SFMT_PARITY3, SFMT_PARITY4];
     for i in 0..4 {
-        inner ^= extract(st, i) & parity[i];
+        inner ^= extract(*st, i) & parity[i];
     }
     for i in [16, 8, 4, 2, 1].iter() {
         inner ^= inner >> i;
@@ -76,8 +74,8 @@ pub fn period_certification(sfmt: &mut SFMT) {
         let mut work = 1_u32;
         for _ in 0..32 {
             if (work & parity[i]) != 0 {
-                let val = extract(st, i) ^ work;
-                insert(&mut st, val as i32, i);
+                let val = extract(*st, i) ^ work;
+                insert(st, val as i32, i);
                 return;
             }
             work = work << 1;
@@ -126,7 +124,7 @@ mod tests {
                     .split(" ")
                     .map(|s| s.trim().parse().unwrap())
                     .collect();
-                __m128i::new(vals[0], vals[1], vals[2], vals[3])
+                unsafe { _mm_set_epi32(vals[0], vals[1], vals[2], vals[3]) }
             }).collect())
     }
 
@@ -139,21 +137,29 @@ mod tests {
         for (v, a) in sfmt.state.iter().zip(ans.iter()) {
             println!("v = {:?}", v);
             println!("a = {:?}", a);
-            assert_eq!(v, a);
+            for i in 0..4 {
+                assert_eq!(extract(*v, i), extract(*a, i));
+            }
         }
     }
 
     #[test]
     fn test_mm_recursion() {
-        let a = _mm_set_epi32(1, 2, 3, 4);
-        let b = _mm_set_epi32(431, 232, 83, 14);
-        let c = _mm_set_epi32(213, 22, 93, 234);
-        let d = _mm_set_epi32(112, 882, 23, 124);
-        let z = mm_recursion(a.into(), a, a.into(), a);
-        let zc = _mm_set_epi32(33816833, 50856450, 67896067, 1049604); // calculated by C code
-        assert_eq!(z, zc);
-        let z = mm_recursion(a.into(), b, c.into(), d);
-        let zc = _mm_set_epi32(398459137, 1355284994, -363068669, 32506884); // calculated by C code
-        assert_eq!(z, zc);
+        unsafe {
+            let a = _mm_set_epi32(1, 2, 3, 4);
+            let b = _mm_set_epi32(431, 232, 83, 14);
+            let c = _mm_set_epi32(213, 22, 93, 234);
+            let d = _mm_set_epi32(112, 882, 23, 124);
+            let z = mm_recursion(a.into(), a, a.into(), a);
+            let zc = _mm_set_epi32(33816833, 50856450, 67896067, 1049604); // calculated by C code
+            for i in 0..4 {
+                assert_eq!(extract(z, i), extract(zc, i));
+            }
+            let z = mm_recursion(a.into(), b, c.into(), d);
+            let zc = _mm_set_epi32(398459137, 1355284994, -363068669, 32506884); // calculated by C code
+            for i in 0..4 {
+                assert_eq!(extract(z, i), extract(zc, i));
+            }
+        }
     }
 }
