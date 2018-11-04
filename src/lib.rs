@@ -4,25 +4,18 @@
 //! [stable SIMD]: https://github.com/rust-lang/rfcs/blob/master/text/2325-stable-simd.md
 //!
 //! ```
-//! # extern crate rand;
-//! # extern crate sfmt;
 //! use rand::{Rng, FromEntropy};
 //! let mut rng = sfmt::SFMT::from_entropy();
 //! let r = rng.gen::<u32>();
 //! println!("random u32 number = {}", r);
 //! ```
 
-extern crate packed_simd;
-extern crate rand;
-extern crate rand_core;
-
 mod sfmt;
 mod thread_rng;
 
-use packed_simd::*;
 use rand_core::{impls, Error, RngCore, SeedableRng};
 
-pub use thread_rng::{thread_rng, ThreadRng};
+pub use crate::thread_rng::{thread_rng, ThreadRng};
 
 /// State of SFMT
 ///

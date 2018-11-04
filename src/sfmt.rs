@@ -1,7 +1,5 @@
 //! Rust re-implementation of SFMT
 
-use packed_simd::{i32x4, u32x4};
-
 use super::SFMT;
 
 const SFMT_MEXP: usize = 19937;
