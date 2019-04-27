@@ -23,12 +23,12 @@ jobs:
         nightly:
           rust_toolchain: nightly
     steps:
-      - pwsh: |
+      - script: |
           curl -sSf -o rustup-init.exe https://win.rustup.rs
           rustup-init.exe -y --default-toolchain %RUST_TOOLCHAIN%
           set PATH=%PATH%;%USERPROFILE%\.cargo\bin
           echo '##vso[task.setvariable variable=PATH;]%PATH%;%USERPROFILE%\.cargo\bin'
         displayName: install rustup on Windows
 
-      - pwsh: cargo test --verbose
+      - script: cargo test --verbose
         displayName: run test
