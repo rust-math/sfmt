@@ -1,7 +1,4 @@
-extern crate rand;
-extern crate sfmt;
-
-use rand::{RngCore, SeedableRng};
+use rand_core::{RngCore, SeedableRng};
 use sfmt::*;
 use std::io::Read;
 

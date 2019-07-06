@@ -11,6 +11,9 @@ keywords = ["random", "rng"]
 categories = ["algorithms"]
 license = "MIT"
 
+[features]
+thread = ["rand"]
+
 [dependencies]
 rand_core = "0.5"
-rand = "0.7"
+rand = {version = "0.7", optional = true}
