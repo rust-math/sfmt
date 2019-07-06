@@ -32,3 +32,6 @@ jobs:
 
       - script: cargo test -v 2>&1
         displayName: run test
+
+      - script: cargo test -v --features thread 2>&1
+        displayName: run test with thread features
