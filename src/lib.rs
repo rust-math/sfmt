@@ -4,7 +4,7 @@
 //! [stable SIMD]: https://github.com/rust-lang/rfcs/blob/master/text/2325-stable-simd.md
 //!
 //! ```
-//! use rand::{Rng, FromEntropy};
+//! use rand::prelude::*;
 //! let mut rng = sfmt::SFMT::from_entropy();
 //! let r = rng.gen::<u32>();
 //! println!("random u32 number = {}", r);
@@ -58,7 +58,7 @@ impl SeedableRng for SFMT {
 
     fn from_seed(seed: [u8; 4]) -> Self {
         let mut sfmt = SFMT {
-            state:  [zero(); sfmt::SFMT_N],
+            state: [zero(); sfmt::SFMT_N],
             idx: 0,
         };
         let seed = unsafe { *(seed.as_ptr() as *const u32) };
@@ -95,7 +95,7 @@ impl RngCore for SFMT {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use rand::{FromEntropy, Rng};
+    use rand::{Rng, SeedableRng};
 
     #[test]
     fn random() {

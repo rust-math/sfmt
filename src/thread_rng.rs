@@ -2,8 +2,7 @@
 
 use super::SFMT;
 
-use rand::FromEntropy;
-use rand_core::{Error, RngCore};
+use rand::{Error, RngCore, SeedableRng};
 use std::cell::RefCell;
 use std::rc::Rc;
 
