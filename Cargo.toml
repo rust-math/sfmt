@@ -12,6 +12,8 @@ categories = ["algorithms"]
 license = "MIT"
 
 [features]
+default = ["thread_rng"]
+
 # The thread_rng feature requires the rand dependency
 thread_rng = ["rand"]
 
