@@ -1,4 +1,4 @@
-#![cfg(feature = "thread")]
+#![cfg(feature = "thread_rng")]
 
 use rand::Rng;
 use std::thread;

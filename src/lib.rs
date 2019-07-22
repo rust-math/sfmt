@@ -12,13 +12,13 @@
 
 mod packed;
 mod sfmt;
-#[cfg(feature = "thread")]
+#[cfg(feature = "thread_rng")]
 mod thread_rng;
 
 use rand_core::{impls, Error, RngCore, SeedableRng};
 
 use self::packed::*;
-#[cfg(feature = "thread")]
+#[cfg(feature = "thread_rng")]
 pub use self::thread_rng::{thread_rng, ThreadRng};
 
 /// State of SFMT
