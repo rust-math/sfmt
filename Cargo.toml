@@ -11,6 +11,12 @@ keywords = ["random", "rng"]
 categories = ["algorithms"]
 license = "MIT"
 
+[features]
+default = ["thread_rng"]
+
+# The thread_rng feature requires the rand dependency
+thread_rng = ["rand"]
+
 [dependencies]
 rand_core = "0.5"
-rand = "0.7"
+rand = {version = "0.7", optional = true}

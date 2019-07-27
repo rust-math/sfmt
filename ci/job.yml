@@ -20,3 +20,5 @@ jobs:
         displayName: install rustup
       - script: cargo test --verbose
         displayName: run test
+      - script: cargo test -v --no-default-features
+        displayName: run test no default features

@@ -4,19 +4,21 @@
 //! [stable SIMD]: https://github.com/rust-lang/rfcs/blob/master/text/2325-stable-simd.md
 //!
 //! ```
-//! use rand::prelude::*;
-//! let mut rng = sfmt::SFMT::from_entropy();
-//! let r = rng.gen::<u32>();
+//! use rand_core::{RngCore, SeedableRng};
+//! let mut rng = sfmt::SFMT::seed_from_u64(42);
+//! let r = rng.next_u32();
 //! println!("random u32 number = {}", r);
 //! ```
 
 mod packed;
 mod sfmt;
+#[cfg(feature = "thread_rng")]
 mod thread_rng;
 
 use rand_core::{impls, Error, RngCore, SeedableRng};
 
 use self::packed::*;
+#[cfg(feature = "thread_rng")]
 pub use self::thread_rng::{thread_rng, ThreadRng};
 
 /// State of SFMT
@@ -95,16 +97,16 @@ impl RngCore for SFMT {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use rand::{Rng, SeedableRng};
+    use rand_core::{RngCore, SeedableRng};
 
     #[test]
     fn random() {
-        let mut rng = SFMT::from_entropy();
+        let mut rng = SFMT::seed_from_u64(0);
         for _ in 0..sfmt::SFMT_N * 20 {
             // Generate many random numbers to test the overwrap
-            let r = rng.gen::<u64>();
+            let r = rng.next_u64();
             if r % 2 == 0 {
-                let _r = rng.gen::<u32>();
+                let _r = rng.next_u32();
             } // shift SFMT.idx randomly
         }
     }

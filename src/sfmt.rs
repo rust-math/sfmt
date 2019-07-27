@@ -113,7 +113,7 @@ pub fn sfmt_init_gen_rand(sfmt: &mut SFMT, seed: u32) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use rand::SeedableRng;
+    use rand_core::SeedableRng;
     use std::{fs, io, io::BufRead};
 
     fn split(a: i32x4) -> (u32, u32, u32, u32) {
@@ -130,7 +130,8 @@ mod tests {
                     .map(|s| s.trim().parse().unwrap())
                     .collect();
                 new(vals[0], vals[1], vals[2], vals[3])
-            }).collect())
+            })
+            .collect())
     }
 
     #[test]

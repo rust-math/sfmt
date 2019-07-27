@@ -1,5 +1,4 @@
-extern crate rand;
-extern crate sfmt;
+#![cfg(feature = "thread_rng")]
 
 use rand::Rng;
 use std::thread;
