@@ -35,3 +35,11 @@ jobs:
 
       - script: cargo test -v --features thread_rng 2>&1
         displayName: run tests with thread_rng feature
+
+schedules:
+  - cron: "0 12 * * 0"
+    displayName: Weekly Sunday build
+    branches:
+      include:
+      - master
+    always: true
