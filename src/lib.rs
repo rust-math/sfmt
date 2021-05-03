@@ -41,7 +41,7 @@ pub type SFMT132049 = paramed::SFMT<132049>;
 /// SFMT with a state length 216091
 pub type SFMT216091 = paramed::SFMT<216091>;
 
-/// Internal implemention of SFMT with `N` parameter.
+/// Internal implemention of SFMT with `MEXP` parameter.
 pub mod paramed {
     use crate::{
         packed::*,
@@ -67,9 +67,9 @@ pub mod paramed {
         pub(crate) idx: usize,
     }
 
-    impl<const N: usize> SFMT<N>
+    impl<const MEXP: usize> SFMT<MEXP>
     where
-        SfmtMEXP<N>: SfmtParams<N>,
+        SfmtMEXP<MEXP>: SfmtParams<MEXP>,
     {
         fn pop32(&mut self) -> u32 {
             let val = extract(self.state[self.idx / 4], self.idx % 4);
@@ -88,41 +88,41 @@ pub mod paramed {
         }
 
         fn gen_all(&mut self) {
-            SfmtMEXP::<N>::sfmt_gen_rand_all(self);
+            SfmtMEXP::<MEXP>::sfmt_gen_rand_all(self);
             self.idx = 0;
         }
     }
 
-    impl<const N: usize> SeedableRng for SFMT<N>
+    impl<const MEXP: usize> SeedableRng for SFMT<MEXP>
     where
-        SfmtMEXP<N>: SfmtParams<N>,
+        SfmtMEXP<MEXP>: SfmtParams<MEXP>,
     {
         type Seed = [u8; 4];
 
         fn from_seed(seed: [u8; 4]) -> Self {
             let mut sfmt = SFMT {
-                state: [zero(); N],
+                state: [zero(); MEXP],
                 idx: 0,
             };
             let seed = unsafe { *(seed.as_ptr() as *const u32) };
-            SfmtMEXP::<N>::sfmt_init_gen_rand(&mut sfmt, seed);
+            SfmtMEXP::<MEXP>::sfmt_init_gen_rand(&mut sfmt, seed);
             sfmt
         }
     }
 
-    impl<const N: usize> RngCore for SFMT<N>
+    impl<const MEXP: usize> RngCore for SFMT<MEXP>
     where
-        SfmtMEXP<N>: SfmtParams<N>,
+        SfmtMEXP<MEXP>: SfmtParams<MEXP>,
     {
         fn next_u32(&mut self) -> u32 {
-            if self.idx >= SfmtMEXP::<N>::SFMT_N32 {
+            if self.idx >= SfmtMEXP::<MEXP>::SFMT_N32 {
                 self.gen_all();
             }
             self.pop32()
         }
 
         fn next_u64(&mut self) -> u64 {
-            if self.idx >= SfmtMEXP::<N>::SFMT_N32 - 1 {
+            if self.idx >= SfmtMEXP::<MEXP>::SFMT_N32 - 1 {
                 // drop last u32 if idx == N32-1
                 self.gen_all();
             }
