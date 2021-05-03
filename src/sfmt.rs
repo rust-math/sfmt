@@ -48,7 +48,7 @@ pub trait SfmtParams<const N: usize>: Sized {
         }
     }
 
-    fn sfmt_gen_rand_all(sfmt: &mut SFMT<N>) {
+    fn sfmt_gen_rand_all(sfmt: &mut paramed::SFMT<N>) {
         let st = &mut sfmt.state;
         let mut r1 = st[Self::SFMT_N - 2];
         let mut r2 = st[Self::SFMT_N - 1];
@@ -64,7 +64,7 @@ pub trait SfmtParams<const N: usize>: Sized {
         }
     }
 
-    fn period_certification(sfmt: &mut SFMT<N>) {
+    fn period_certification(sfmt: &mut paramed::SFMT<N>) {
         let mut inner = 0_u32;
         let st = &mut sfmt.state[0];
         let parity = [
@@ -111,7 +111,7 @@ pub trait SfmtParams<const N: usize>: Sized {
         (new(a, b, c, d), a2)
     }
 
-    fn sfmt_init_gen_rand(sfmt: &mut SFMT<N>, seed: u32) {
+    fn sfmt_init_gen_rand(sfmt: &mut paramed::SFMT<N>, seed: u32) {
         let mut pre = seed as i32;
         for (idx, v) in sfmt.state.iter_mut().enumerate() {
             let (v_, pre_) = Self::map(pre, idx as i32);
@@ -336,7 +336,7 @@ mod tests {
     fn test_init() {
         let seed: u32 = 1234;
         let seed = unsafe { *(&seed as *const u32 as *const [u8; 4]) };
-        let sfmt = SFMT::<19937>::from_seed(seed);
+        let sfmt = paramed::SFMT::<19937>::from_seed(seed);
         let ans = read_answer("check/init1234.txt").unwrap();
         for (v, a) in sfmt.state.iter().zip(ans.iter()) {
             assert_eq!(split(*v), split(*a));

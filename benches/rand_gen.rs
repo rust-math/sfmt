@@ -27,23 +27,23 @@ macro_rules! def_bench {
 mod gen_f64 {
     use super::*;
     def_bench!(xorshift, f64, XorShiftRng::from_entropy());
-    def_bench!(sfmt, f64, SFMT::<19937>::from_entropy());
+    def_bench!(sfmt, f64, SFMT::from_entropy());
 }
 
 mod gen_f32 {
     use super::*;
     def_bench!(xorshift, f32, XorShiftRng::from_entropy());
-    def_bench!(sfmt, f32, SFMT::<19937>::from_entropy());
+    def_bench!(sfmt, f32, SFMT::from_entropy());
 }
 
 mod gen_u64 {
     use super::*;
     def_bench!(xorshift, u64, XorShiftRng::from_entropy());
-    def_bench!(sfmt, u64, SFMT::<19937>::from_entropy());
+    def_bench!(sfmt, u64, SFMT::from_entropy());
 }
 
 mod gen_u32 {
     use super::*;
     def_bench!(xorshift, u32, XorShiftRng::from_entropy());
-    def_bench!(sfmt, u32, SFMT::<19937>::from_entropy());
+    def_bench!(sfmt, u32, SFMT::from_entropy());
 }
