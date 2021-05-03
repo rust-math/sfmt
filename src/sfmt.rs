@@ -6,7 +6,7 @@ use crate::packed::*;
 /// Parameters used in sfmt.
 pub trait SfmtParams<const MEXP: usize, const MEXP_N: usize>: Sized {
     const SFMT_MEXP: usize = MEXP;
-    const SFMT_N: usize = MEXP_N; //Self::SFMT_MEXP / 128 + 1; // = 156
+    const SFMT_N: usize = MEXP_N; //Self::SFMT_MEXP / 128 + 1;
     const SFMT_N32: usize = Self::SFMT_N * 4;
 
     const SFMT_POS1: usize;

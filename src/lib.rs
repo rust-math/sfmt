@@ -34,11 +34,11 @@ pub type SFMT11213 = paramed::SFMT<11213, { 11213 / 128 + 1 }>;
 pub type SFMT19937 = paramed::SFMT<19937, { 19937 / 128 + 1 }>;
 /// SFMT with a state length 44497
 pub type SFMT44497 = paramed::SFMT<44497, { 44497 / 128 + 1 }>;
-/// SFMT with a state length 86243. Can cause stack overlow for now.
+/// SFMT with a state length 86243.
 pub type SFMT86243 = paramed::SFMT<86243, { 86243 / 128 + 1 }>;
-/// SFMT with a state length 132049. Can cause stack overlow for now.
+/// SFMT with a state length 132049.
 pub type SFMT132049 = paramed::SFMT<132049, { 132049 / 128 + 1 }>;
-/// SFMT with a state length 216091. Can cause stack overlow for now.
+/// SFMT with a state length 216091.
 pub type SFMT216091 = paramed::SFMT<216091, { 216091 / 128 + 1 }>;
 
 /// Internal implemention of SFMT with `MEXP` parameter.
@@ -55,6 +55,7 @@ pub mod paramed {
     /// The MEXP is a parameter that defines a length of state.
     /// MEXP is limted to be a known value, and it is checked at compile time.
     /// MEXP can only be `607,1279,2281,4253,11213,19937,44497,86243,132049,216091`.
+    /// Since there is a limitation to const generics, we also need the `MEXP_N = {MEXP / 128 + 1}`
     /// ```
     /// # use rand_core::SeedableRng;
     /// let s = sfmt::SFMT19937::seed_from_u64(23);
@@ -144,7 +145,18 @@ mod tests {
     use rand_core::{RngCore, SeedableRng};
 
     #[test]
-    fn random() {
+    fn random_607() {
+        let mut rng = SFMT607::seed_from_u64(0);
+        for _ in 0..607 * 20 {
+            // Generate many random numbers to test the overwrap
+            let r = rng.next_u64();
+            if r % 2 == 0 {
+                let _r = rng.next_u32();
+            } // shift SFMT.idx randomly
+        }
+    }
+    #[test]
+    fn random_19937() {
         let mut rng = SFMT::seed_from_u64(0);
         for _ in 0..19937 * 20 {
             // Generate many random numbers to test the overwrap
@@ -165,10 +177,21 @@ mod tests {
             } // shift SFMT.idx randomly
         }
     }
-    //#[test]
+    #[test]
     fn random_86243() {
         let mut rng = SFMT86243::seed_from_u64(0);
         for _ in 0..86243 * 20 {
+            // Generate many random numbers to test the overwrap
+            let r = rng.next_u64();
+            if r % 2 == 0 {
+                let _r = rng.next_u32();
+            } // shift SFMT.idx randomly
+        }
+    }
+    #[test]
+    fn random_216091() {
+        let mut rng = SFMT216091::seed_from_u64(0);
+        for _ in 0..216091 * 20 {
             // Generate many random numbers to test the overwrap
             let r = rng.next_u64();
             if r % 2 == 0 {
