@@ -34,11 +34,11 @@ pub type SFMT11213 = paramed::SFMT<11213>;
 pub type SFMT19937 = paramed::SFMT<19937>;
 /// SFMT with a state length 44497
 pub type SFMT44497 = paramed::SFMT<44497>;
-/// SFMT with a state length 86243
+/// SFMT with a state length 86243. Can cause stack overlow for now.
 pub type SFMT86243 = paramed::SFMT<86243>;
-/// SFMT with a state length 132049
+/// SFMT with a state length 132049. Can cause stack overlow for now.
 pub type SFMT132049 = paramed::SFMT<132049>;
-/// SFMT with a state length 216091
+/// SFMT with a state length 216091. Can cause stack overlow for now.
 pub type SFMT216091 = paramed::SFMT<216091>;
 
 /// Internal implemention of SFMT with `MEXP` parameter.
@@ -147,6 +147,28 @@ mod tests {
     fn random() {
         let mut rng = SFMT::seed_from_u64(0);
         for _ in 0..19937 * 20 {
+            // Generate many random numbers to test the overwrap
+            let r = rng.next_u64();
+            if r % 2 == 0 {
+                let _r = rng.next_u32();
+            } // shift SFMT.idx randomly
+        }
+    }
+    #[test]
+    fn random_44497() {
+        let mut rng = SFMT44497::seed_from_u64(0);
+        for _ in 0..44497 * 20 {
+            // Generate many random numbers to test the overwrap
+            let r = rng.next_u64();
+            if r % 2 == 0 {
+                let _r = rng.next_u32();
+            } // shift SFMT.idx randomly
+        }
+    }
+    //#[test]
+    fn random_86243() {
+        let mut rng = SFMT86243::seed_from_u64(0);
+        for _ in 0..86243 * 20 {
             // Generate many random numbers to test the overwrap
             let r = rng.next_u64();
             if r % 2 == 0 {
