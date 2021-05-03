@@ -17,7 +17,7 @@ fn gen_u32() {
     let ans = read_answer().expect("Failed to load answers");
     let seed: u32 = 1234;
     let seed = unsafe { *(&seed as *const u32 as *const [u8; 4]) };
-    let mut sfmt = SFMT::from_seed(seed); // 1234 = 0x4D2
+    let mut sfmt = SFMT::<19937>::from_seed(seed); // 1234 = 0x4D2
     for (t, val) in ans.into_iter().enumerate() {
         let r = sfmt.next_u32();
         println!("[{}] gen = {}, ans = {}", t, r, val);

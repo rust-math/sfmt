@@ -5,7 +5,7 @@
 //!
 //! ```
 //! use rand_core::{RngCore, SeedableRng};
-//! let mut rng = sfmt::SFMT::seed_from_u64(42);
+//! let mut rng = sfmt::SFMT::<19937>::seed_from_u64(42);
 //! let r = rng.next_u32();
 //! println!("random u32 number = {}", r);
 //! ```
@@ -14,7 +14,8 @@ mod packed;
 mod sfmt;
 #[cfg(feature = "thread_rng")]
 mod thread_rng;
-
+pub use crate::sfmt::SfmtParam;
+use crate::sfmt::SfmtParams;
 use rand_core::{impls, Error, RngCore, SeedableRng};
 
 use self::packed::*;
@@ -24,15 +25,22 @@ pub use self::thread_rng::{thread_rng, ThreadRng};
 /// State of SFMT
 ///
 /// This struct implements random number generation through `rand::Rng`.
+
+/// State of SFMT
+///
+/// This struct implements random number generation through `rand::Rng`.
 #[derive(Clone)]
-pub struct SFMT {
+pub struct SFMT<const N: usize> {
     /// the 128-bit internal state array
-    state: [i32x4; sfmt::SFMT_N],
+    pub(crate) state: [i32x4; N],
     /// index counter to the 32-bit internal state array
-    idx: usize,
+    pub(crate) idx: usize,
 }
 
-impl SFMT {
+impl<const N: usize> SFMT<N>
+where
+    SfmtParam<N>: SfmtParams<N>,
+{
     fn pop32(&mut self) -> u32 {
         let val = extract(self.state[self.idx / 4], self.idx % 4);
         self.idx += 1;
@@ -50,35 +58,41 @@ impl SFMT {
     }
 
     fn gen_all(&mut self) {
-        sfmt::sfmt_gen_rand_all(self);
+        SfmtParam::<N>::sfmt_gen_rand_all(self);
         self.idx = 0;
     }
 }
 
-impl SeedableRng for SFMT {
+impl<const N: usize> SeedableRng for SFMT<N>
+where
+    SfmtParam<N>: SfmtParams<N>,
+{
     type Seed = [u8; 4];
 
     fn from_seed(seed: [u8; 4]) -> Self {
         let mut sfmt = SFMT {
-            state: [zero(); sfmt::SFMT_N],
+            state: [zero(); N],
             idx: 0,
         };
         let seed = unsafe { *(seed.as_ptr() as *const u32) };
-        sfmt::sfmt_init_gen_rand(&mut sfmt, seed);
+        SfmtParam::<N>::sfmt_init_gen_rand(&mut sfmt, seed);
         sfmt
     }
 }
 
-impl RngCore for SFMT {
+impl<const N: usize> RngCore for SFMT<N>
+where
+    SfmtParam<N>: SfmtParams<N>,
+{
     fn next_u32(&mut self) -> u32 {
-        if self.idx >= sfmt::SFMT_N32 {
+        if self.idx >= SfmtParam::<N>::SFMT_N32 {
             self.gen_all();
         }
         self.pop32()
     }
 
     fn next_u64(&mut self) -> u64 {
-        if self.idx >= sfmt::SFMT_N32 - 1 {
+        if self.idx >= SfmtParam::<N>::SFMT_N32 - 1 {
             // drop last u32 if idx == N32-1
             self.gen_all();
         }
@@ -101,8 +115,8 @@ mod tests {
 
     #[test]
     fn random() {
-        let mut rng = SFMT::seed_from_u64(0);
-        for _ in 0..sfmt::SFMT_N * 20 {
+        let mut rng = SFMT::<19937>::seed_from_u64(0);
+        for _ in 0..19937 * 20 {
             // Generate many random numbers to test the overwrap
             let r = rng.next_u64();
             if r % 2 == 0 {

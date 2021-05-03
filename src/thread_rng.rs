@@ -7,7 +7,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 thread_local!(
-    static THREAD_RNG_KEY: Rc<RefCell<SFMT>> = {
+    static THREAD_RNG_KEY: Rc<RefCell<SFMT<19937>>> = {
         Rc::new(RefCell::new(SFMT::from_entropy()))
     }
 );
@@ -17,7 +17,7 @@ thread_local!(
 /// See the reference of the function [thread_rng](fn.thread_rng.html), which generates this struct.
 #[derive(Clone)]
 pub struct ThreadRng {
-    rng: Rc<RefCell<SFMT>>,
+    rng: Rc<RefCell<SFMT<19937>>>,
 }
 
 /// Create a thread local RNG.
