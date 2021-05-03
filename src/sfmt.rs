@@ -3,6 +3,7 @@
 use super::*;
 use crate::packed::*;
 
+/// Parameters used in sfmt.
 pub trait SfmtParams<const N: usize>: Sized {
     const SFMT_MEXP: usize = N;
     const SFMT_N: usize = Self::SFMT_MEXP / 128 + 1; // = 156
@@ -121,14 +122,14 @@ pub trait SfmtParams<const N: usize>: Sized {
         Self::period_certification(sfmt);
     }
 }
-
-pub struct SfmtParam<const N: usize>;
+/// Wrapper for `N` parameter.
+pub struct SfmtN<const N: usize>;
 
 macro_rules! parms_impl {
     ($n : expr, $pos1 : expr, $sl1 : expr, $sl2 : expr, $sr1 : expr, $sr2 : expr,
         $msk1 : expr, $msk2 : expr, $msk3 : expr, $msk4 : expr,
         $parity1 : expr, $parity2 : expr, $parity3 : expr, $parity4 : expr) => {
-        impl SfmtParams<$n> for SfmtParam<$n> {
+        impl SfmtParams<$n> for SfmtN<$n> {
             const SFMT_POS1: usize = $pos1;
             const SFMT_SL1: i32 = $sl1;
             const SFMT_SL2: i32 = $sl2;
@@ -345,14 +346,14 @@ mod tests {
     #[test]
     fn test_mm_recursion_19937() {
         let a = new(1, 2, 3, 4);
-        let z = SfmtParam::<19937>::mm_recursion(a, a, a, a);
+        let z = SfmtN::<19937>::mm_recursion(a, a, a, a);
         let zc = new(33816833, 50856450, 67896067, 1049604); // calculated by C code
         assert_eq!(split(z), split(zc));
 
         let b = new(431, 232, 83, 14);
         let c = new(213, 22, 93, 234);
         let d = new(112, 882, 23, 124);
-        let z = SfmtParam::<19937>::mm_recursion(a, b, c, d);
+        let z = SfmtN::<19937>::mm_recursion(a, b, c, d);
         let zc = new(398459137, 1355284994, -363068669, 32506884); // calculated by C code
         assert_eq!(split(z), split(zc));
     }

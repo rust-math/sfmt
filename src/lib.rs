@@ -14,7 +14,7 @@ mod packed;
 mod sfmt;
 #[cfg(feature = "thread_rng")]
 mod thread_rng;
-pub use crate::sfmt::SfmtParam;
+use crate::sfmt::SfmtN;
 use crate::sfmt::SfmtParams;
 use rand_core::{impls, Error, RngCore, SeedableRng};
 
@@ -25,10 +25,9 @@ pub use self::thread_rng::{thread_rng, ThreadRng};
 /// State of SFMT
 ///
 /// This struct implements random number generation through `rand::Rng`.
-
-/// State of SFMT
-///
-/// This struct implements random number generation through `rand::Rng`.
+/// The N is a parameter that defines a length of state.
+/// N is limted to be a known value, and it is checked at compile time.
+/// N can only be `607,1279,2281,4253,11213,19937,44497,86243,132049,216091`.
 #[derive(Clone)]
 pub struct SFMT<const N: usize> {
     /// the 128-bit internal state array
@@ -39,7 +38,7 @@ pub struct SFMT<const N: usize> {
 
 impl<const N: usize> SFMT<N>
 where
-    SfmtParam<N>: SfmtParams<N>,
+    SfmtN<N>: SfmtParams<N>,
 {
     fn pop32(&mut self) -> u32 {
         let val = extract(self.state[self.idx / 4], self.idx % 4);
@@ -58,14 +57,14 @@ where
     }
 
     fn gen_all(&mut self) {
-        SfmtParam::<N>::sfmt_gen_rand_all(self);
+        SfmtN::<N>::sfmt_gen_rand_all(self);
         self.idx = 0;
     }
 }
 
 impl<const N: usize> SeedableRng for SFMT<N>
 where
-    SfmtParam<N>: SfmtParams<N>,
+    SfmtN<N>: SfmtParams<N>,
 {
     type Seed = [u8; 4];
 
@@ -75,24 +74,24 @@ where
             idx: 0,
         };
         let seed = unsafe { *(seed.as_ptr() as *const u32) };
-        SfmtParam::<N>::sfmt_init_gen_rand(&mut sfmt, seed);
+        SfmtN::<N>::sfmt_init_gen_rand(&mut sfmt, seed);
         sfmt
     }
 }
 
 impl<const N: usize> RngCore for SFMT<N>
 where
-    SfmtParam<N>: SfmtParams<N>,
+    SfmtN<N>: SfmtParams<N>,
 {
     fn next_u32(&mut self) -> u32 {
-        if self.idx >= SfmtParam::<N>::SFMT_N32 {
+        if self.idx >= SfmtN::<N>::SFMT_N32 {
             self.gen_all();
         }
         self.pop32()
     }
 
     fn next_u64(&mut self) -> u64 {
-        if self.idx >= SfmtParam::<N>::SFMT_N32 - 1 {
+        if self.idx >= SfmtN::<N>::SFMT_N32 - 1 {
             // drop last u32 if idx == N32-1
             self.gen_all();
         }
