@@ -4,9 +4,9 @@ use super::*;
 use crate::packed::*;
 
 /// Parameters used in sfmt.
-pub trait SfmtParams<const MEXP: usize>: Sized {
+pub trait SfmtParams<const MEXP: usize, const MEXP_N: usize>: Sized {
     const SFMT_MEXP: usize = MEXP;
-    const SFMT_N: usize = Self::SFMT_MEXP / 128 + 1; // = 156
+    const SFMT_N: usize = MEXP_N; //Self::SFMT_MEXP / 128 + 1; // = 156
     const SFMT_N32: usize = Self::SFMT_N * 4;
 
     const SFMT_POS1: usize;
@@ -48,7 +48,7 @@ pub trait SfmtParams<const MEXP: usize>: Sized {
         }
     }
 
-    fn sfmt_gen_rand_all(sfmt: &mut paramed::SFMT<MEXP>) {
+    fn sfmt_gen_rand_all(sfmt: &mut paramed::SFMT<MEXP, MEXP_N>) {
         let st = &mut sfmt.state;
         let mut r1 = st[Self::SFMT_N - 2];
         let mut r2 = st[Self::SFMT_N - 1];
@@ -64,7 +64,7 @@ pub trait SfmtParams<const MEXP: usize>: Sized {
         }
     }
 
-    fn period_certification(sfmt: &mut paramed::SFMT<MEXP>) {
+    fn period_certification(sfmt: &mut paramed::SFMT<MEXP, MEXP_N>) {
         let mut inner = 0_u32;
         let st = &mut sfmt.state[0];
         let parity = [
@@ -111,7 +111,7 @@ pub trait SfmtParams<const MEXP: usize>: Sized {
         (new(a, b, c, d), a2)
     }
 
-    fn sfmt_init_gen_rand(sfmt: &mut paramed::SFMT<MEXP>, seed: u32) {
+    fn sfmt_init_gen_rand(sfmt: &mut paramed::SFMT<MEXP, MEXP_N>, seed: u32) {
         let mut pre = seed as i32;
         for (idx, v) in sfmt.state.iter_mut().enumerate() {
             let (v_, pre_) = Self::map(pre, idx as i32);
@@ -123,13 +123,13 @@ pub trait SfmtParams<const MEXP: usize>: Sized {
     }
 }
 /// Wrapper for `MEXP` parameter.
-pub struct SfmtMEXP<const MEXP: usize>;
+pub struct SFMTMEXP<const MEXP: usize, const MEXP_N: usize>;
 
 macro_rules! parms_impl {
-    ($n : expr, $pos1 : expr, $sl1 : expr, $sl2 : expr, $sr1 : expr, $sr2 : expr,
+    ($mexp : expr, $n : expr, $pos1 : expr, $sl1 : expr, $sl2 : expr, $sr1 : expr, $sr2 : expr,
         $msk1 : expr, $msk2 : expr, $msk3 : expr, $msk4 : expr,
         $parity1 : expr, $parity2 : expr, $parity3 : expr, $parity4 : expr) => {
-        impl SfmtParams<$n> for SfmtMEXP<$n> {
+        impl SfmtParams<$mexp, $n> for SFMTMEXP<$mexp, $n> {
             const SFMT_POS1: usize = $pos1;
             const SFMT_SL1: i32 = $sl1;
             const SFMT_SL2: i32 = $sl2;
@@ -149,6 +149,7 @@ macro_rules! parms_impl {
 
 parms_impl!(
     607,
+    { 607 / 128 + 1 },
     2,
     15,
     3,
@@ -165,6 +166,7 @@ parms_impl!(
 );
 parms_impl!(
     1279,
+    { 1279 / 128 + 1 },
     7,
     14,
     3,
@@ -181,6 +183,7 @@ parms_impl!(
 );
 parms_impl!(
     2281,
+    { 2281 / 128 + 1 },
     12,
     19,
     1,
@@ -197,6 +200,7 @@ parms_impl!(
 );
 parms_impl!(
     4253,
+    { 4253 / 128 + 1 },
     17,
     20,
     1,
@@ -213,6 +217,7 @@ parms_impl!(
 );
 parms_impl!(
     11213,
+    { 11213 / 128 + 1 },
     68,
     14,
     3,
@@ -229,6 +234,7 @@ parms_impl!(
 );
 parms_impl!(
     19937,
+    { 19937 / 128 + 1 },
     122,
     18,
     1,
@@ -245,6 +251,7 @@ parms_impl!(
 );
 parms_impl!(
     44497,
+    { 44497 / 128 + 1 },
     330,
     5,
     3,
@@ -261,6 +268,7 @@ parms_impl!(
 );
 parms_impl!(
     86243,
+    { 86243 / 128 + 1 },
     366,
     6,
     7,
@@ -277,6 +285,7 @@ parms_impl!(
 );
 parms_impl!(
     132049,
+    { 132049 / 128 + 1 },
     110,
     19,
     1,
@@ -293,6 +302,7 @@ parms_impl!(
 );
 parms_impl!(
     216091,
+    { 216091 / 128 + 1 },
     627,
     11,
     3,
@@ -336,7 +346,7 @@ mod tests {
     fn test_init() {
         let seed: u32 = 1234;
         let seed = unsafe { *(&seed as *const u32 as *const [u8; 4]) };
-        let sfmt = paramed::SFMT::<19937>::from_seed(seed);
+        let sfmt = paramed::SFMT::<19937, { 19937 / 128 + 1 }>::from_seed(seed);
         let ans = read_answer("check/init1234.txt").unwrap();
         for (v, a) in sfmt.state.iter().zip(ans.iter()) {
             assert_eq!(split(*v), split(*a));
@@ -346,14 +356,14 @@ mod tests {
     #[test]
     fn test_mm_recursion_19937() {
         let a = new(1, 2, 3, 4);
-        let z = SfmtMEXP::<19937>::mm_recursion(a, a, a, a);
+        let z = SFMTMEXP::<19937, { 19937 / 128 + 1 }>::mm_recursion(a, a, a, a);
         let zc = new(33816833, 50856450, 67896067, 1049604); // calculated by C code
         assert_eq!(split(z), split(zc));
 
         let b = new(431, 232, 83, 14);
         let c = new(213, 22, 93, 234);
         let d = new(112, 882, 23, 124);
-        let z = SfmtMEXP::<19937>::mm_recursion(a, b, c, d);
+        let z = SFMTMEXP::<19937, { 19937 / 128 + 1 }>::mm_recursion(a, b, c, d);
         let zc = new(398459137, 1355284994, -363068669, 32506884); // calculated by C code
         assert_eq!(split(z), split(zc));
     }
