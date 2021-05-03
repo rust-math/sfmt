@@ -45,31 +45,31 @@ pub type SFMT216091 = paramed::SFMT<216091>;
 pub mod paramed {
     use crate::{
         packed::*,
-        sfmt::{SfmtN, SfmtParams},
+        sfmt::{SfmtMEXP, SfmtParams},
     };
     use rand_core::{impls, Error, RngCore, SeedableRng};
 
     /// State of SFMT
     ///
     /// This struct implements random number generation through `rand::Rng`.
-    /// The N is a parameter that defines a length of state.
-    /// N is limted to be a known value, and it is checked at compile time.
-    /// N can only be `607,1279,2281,4253,11213,19937,44497,86243,132049,216091`.
+    /// The MEXP is a parameter that defines a length of state.
+    /// MEXP is limted to be a known value, and it is checked at compile time.
+    /// MEXP can only be `607,1279,2281,4253,11213,19937,44497,86243,132049,216091`.
     /// ```
     /// # use rand_core::SeedableRng;
     /// let s = sfmt::SFMT19937::seed_from_u64(23);
     /// ```
     #[derive(Clone)]
-    pub struct SFMT<const N: usize> {
+    pub struct SFMT<const MEXP: usize> {
         /// the 128-bit internal state array
-        pub(crate) state: [i32x4; N],
+        pub(crate) state: [i32x4; MEXP],
         /// index counter to the 32-bit internal state array
         pub(crate) idx: usize,
     }
 
     impl<const N: usize> SFMT<N>
     where
-        SfmtN<N>: SfmtParams<N>,
+        SfmtMEXP<N>: SfmtParams<N>,
     {
         fn pop32(&mut self) -> u32 {
             let val = extract(self.state[self.idx / 4], self.idx % 4);
@@ -88,14 +88,14 @@ pub mod paramed {
         }
 
         fn gen_all(&mut self) {
-            SfmtN::<N>::sfmt_gen_rand_all(self);
+            SfmtMEXP::<N>::sfmt_gen_rand_all(self);
             self.idx = 0;
         }
     }
 
     impl<const N: usize> SeedableRng for SFMT<N>
     where
-        SfmtN<N>: SfmtParams<N>,
+        SfmtMEXP<N>: SfmtParams<N>,
     {
         type Seed = [u8; 4];
 
@@ -105,24 +105,24 @@ pub mod paramed {
                 idx: 0,
             };
             let seed = unsafe { *(seed.as_ptr() as *const u32) };
-            SfmtN::<N>::sfmt_init_gen_rand(&mut sfmt, seed);
+            SfmtMEXP::<N>::sfmt_init_gen_rand(&mut sfmt, seed);
             sfmt
         }
     }
 
     impl<const N: usize> RngCore for SFMT<N>
     where
-        SfmtN<N>: SfmtParams<N>,
+        SfmtMEXP<N>: SfmtParams<N>,
     {
         fn next_u32(&mut self) -> u32 {
-            if self.idx >= SfmtN::<N>::SFMT_N32 {
+            if self.idx >= SfmtMEXP::<N>::SFMT_N32 {
                 self.gen_all();
             }
             self.pop32()
         }
 
         fn next_u64(&mut self) -> u64 {
-            if self.idx >= SfmtN::<N>::SFMT_N32 - 1 {
+            if self.idx >= SfmtMEXP::<N>::SFMT_N32 - 1 {
                 // drop last u32 if idx == N32-1
                 self.gen_all();
             }

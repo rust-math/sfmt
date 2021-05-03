@@ -4,8 +4,8 @@ use super::*;
 use crate::packed::*;
 
 /// Parameters used in sfmt.
-pub trait SfmtParams<const N: usize>: Sized {
-    const SFMT_MEXP: usize = N;
+pub trait SfmtParams<const MEXP: usize>: Sized {
+    const SFMT_MEXP: usize = MEXP;
     const SFMT_N: usize = Self::SFMT_MEXP / 128 + 1; // = 156
     const SFMT_N32: usize = Self::SFMT_N * 4;
 
@@ -48,7 +48,7 @@ pub trait SfmtParams<const N: usize>: Sized {
         }
     }
 
-    fn sfmt_gen_rand_all(sfmt: &mut paramed::SFMT<N>) {
+    fn sfmt_gen_rand_all(sfmt: &mut paramed::SFMT<MEXP>) {
         let st = &mut sfmt.state;
         let mut r1 = st[Self::SFMT_N - 2];
         let mut r2 = st[Self::SFMT_N - 1];
@@ -64,7 +64,7 @@ pub trait SfmtParams<const N: usize>: Sized {
         }
     }
 
-    fn period_certification(sfmt: &mut paramed::SFMT<N>) {
+    fn period_certification(sfmt: &mut paramed::SFMT<MEXP>) {
         let mut inner = 0_u32;
         let st = &mut sfmt.state[0];
         let parity = [
@@ -111,7 +111,7 @@ pub trait SfmtParams<const N: usize>: Sized {
         (new(a, b, c, d), a2)
     }
 
-    fn sfmt_init_gen_rand(sfmt: &mut paramed::SFMT<N>, seed: u32) {
+    fn sfmt_init_gen_rand(sfmt: &mut paramed::SFMT<MEXP>, seed: u32) {
         let mut pre = seed as i32;
         for (idx, v) in sfmt.state.iter_mut().enumerate() {
             let (v_, pre_) = Self::map(pre, idx as i32);
@@ -122,14 +122,14 @@ pub trait SfmtParams<const N: usize>: Sized {
         Self::period_certification(sfmt);
     }
 }
-/// Wrapper for `N` parameter.
-pub struct SfmtN<const N: usize>;
+/// Wrapper for `MEXP` parameter.
+pub struct SfmtMEXP<const MEXP: usize>;
 
 macro_rules! parms_impl {
     ($n : expr, $pos1 : expr, $sl1 : expr, $sl2 : expr, $sr1 : expr, $sr2 : expr,
         $msk1 : expr, $msk2 : expr, $msk3 : expr, $msk4 : expr,
         $parity1 : expr, $parity2 : expr, $parity3 : expr, $parity4 : expr) => {
-        impl SfmtParams<$n> for SfmtN<$n> {
+        impl SfmtParams<$n> for SfmtMEXP<$n> {
             const SFMT_POS1: usize = $pos1;
             const SFMT_SL1: i32 = $sl1;
             const SFMT_SL2: i32 = $sl2;
@@ -346,14 +346,14 @@ mod tests {
     #[test]
     fn test_mm_recursion_19937() {
         let a = new(1, 2, 3, 4);
-        let z = SfmtN::<19937>::mm_recursion(a, a, a, a);
+        let z = SfmtMEXP::<19937>::mm_recursion(a, a, a, a);
         let zc = new(33816833, 50856450, 67896067, 1049604); // calculated by C code
         assert_eq!(split(z), split(zc));
 
         let b = new(431, 232, 83, 14);
         let c = new(213, 22, 93, 234);
         let d = new(112, 882, 23, 124);
-        let z = SfmtN::<19937>::mm_recursion(a, b, c, d);
+        let z = SfmtMEXP::<19937>::mm_recursion(a, b, c, d);
         let zc = new(398459137, 1355284994, -363068669, 32506884); // calculated by C code
         assert_eq!(split(z), split(zc));
     }
