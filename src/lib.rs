@@ -18,18 +18,30 @@ mod thread_rng;
 #[cfg(feature = "thread_rng")]
 pub use self::thread_rng::{thread_rng, ThreadRng};
 
+/// Fall back to [`SFMT19937`], not be a breaking change.
 pub type SFMT = SFMT19937;
+/// SFMT with a state length 607
 pub type SFMT607 = paramed::SFMT<607>;
+/// SFMT with a state length 1279
 pub type SFMT1279 = paramed::SFMT<1279>;
+/// SFMT with a state length 2281
 pub type SFMT2281 = paramed::SFMT<2281>;
+/// SFMT with a state length 4253
 pub type SFMT4253 = paramed::SFMT<4253>;
+/// SFMT with a state length 11213
 pub type SFMT11213 = paramed::SFMT<11213>;
+/// SFMT with a state length 19937
 pub type SFMT19937 = paramed::SFMT<19937>;
+/// SFMT with a state length 44497
 pub type SFMT44497 = paramed::SFMT<44497>;
+/// SFMT with a state length 86243
 pub type SFMT86243 = paramed::SFMT<86243>;
+/// SFMT with a state length 132049
 pub type SFMT132049 = paramed::SFMT<132049>;
+/// SFMT with a state length 216091
 pub type SFMT216091 = paramed::SFMT<216091>;
 
+/// Internal implemention of SFMT with `N` parameter.
 pub mod paramed {
     use crate::{
         packed::*,
@@ -45,11 +57,7 @@ pub mod paramed {
     /// N can only be `607,1279,2281,4253,11213,19937,44497,86243,132049,216091`.
     /// ```
     /// # use rand_core::SeedableRng;
-    /// let s = sfmt::paramed::SFMT::<19937>::seed_from_u64(23);
-    /// ```
-    /// ```compile_fail
-    /// # use rand_core::SeedableRng;
-    /// let s = sfmt::paramed::SFMT::<2>::seed_from_u64(23);
+    /// let s = sfmt::SFMT19937::seed_from_u64(23);
     /// ```
     #[derive(Clone)]
     pub struct SFMT<const N: usize> {
