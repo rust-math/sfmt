@@ -20,3 +20,6 @@ thread_rng = ["rand"]
 [dependencies]
 rand_core = "0.6.3"
 rand = { version = "0.8.4", optional = true }
+
+[package.metadata.release]
+no-dev-version = true
