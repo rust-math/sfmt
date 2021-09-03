@@ -38,5 +38,5 @@ pub(crate) fn insert(vals: &mut i32x4, val: i32, imm: usize) {
             _ => unreachable!(),
         }
     };
-    ::std::mem::replace(vals, updated);
+    let _ = ::std::mem::replace(vals, updated);
 }
