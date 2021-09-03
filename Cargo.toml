@@ -18,5 +18,5 @@ default = ["thread_rng"]
 thread_rng = ["rand"]
 
 [dependencies]
-rand_core = "0.5"
-rand = {version = "0.7", optional = true}
+rand_core = "0.6.3"
+rand = { version = "0.8.4", optional = true }
