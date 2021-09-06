@@ -1,7 +1,7 @@
 sfmt
 =====
 
-[![Crate](http://meritbadge.herokuapp.com/sfmt)](https://crates.io/crates/sfmt)
+[![Crate](https://img.shields.io/crates/v/sfmt.svg)](https://crates.io/crates/sfmt)
 [![docs.rs](https://docs.rs/sfmt/badge.svg)](https://docs.rs/sfmt)
 [![Build Status](https://dev.azure.com/rust-math/sfmt/_apis/build/status/rust-math.sfmt?branchName=master)](https://dev.azure.com/rust-math/sfmt/_build/latest?definitionId=6&branchName=master)
 [![DOI](https://zenodo.org/badge/118722822.svg)](https://zenodo.org/badge/latestdoi/118722822)
