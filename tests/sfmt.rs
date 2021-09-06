@@ -1,3 +1,4 @@
+use paste::paste;
 use rand_core::{RngCore, SeedableRng};
 use sfmt::*;
 use std::{fs, io, io::BufRead};
@@ -14,13 +15,30 @@ fn read_reference(filename: &str) -> Result<Vec<u64>, io::Error> {
         .collect())
 }
 
-#[test]
-fn compare_to_original_19937() {
-    // This crate only works on x86/x86_64, which must be Little Endition
-    let mut rng = SFMT::from_seed(1234_u32.to_le_bytes());
-    let answer = read_reference("check/u64_19937.txt").unwrap();
-    for ans in answer {
-        let r = rng.next_u64();
-        assert_eq!(r, ans);
-    }
+macro_rules! compare_to_original {
+    ($mexp:expr) => {
+    paste! {
+        #[test]
+        fn [< compare_to_original_ $mexp >]() {
+            // This crate only works on x86/x86_64, which must be Little Endition
+            let mut rng = paramed::SFMT::<$mexp, { $mexp / 128 + 1 }>::from_seed(1234_u32.to_le_bytes());
+            let answer = read_reference(&format!("check/u64_{}.txt", $mexp)).unwrap();
+            for ans in answer {
+                let r = rng.next_u64();
+                assert_eq!(r, ans);
+            }
+        }
+    } // paste
+    };
 }
+
+compare_to_original!(607);
+compare_to_original!(1279);
+compare_to_original!(2281);
+compare_to_original!(4253);
+compare_to_original!(11213);
+compare_to_original!(19937);
+compare_to_original!(44497);
+compare_to_original!(86243);
+compare_to_original!(132049);
+compare_to_original!(216091);
