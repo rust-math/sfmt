@@ -191,7 +191,7 @@ parms_impl!(
     1,
     0xbff7_ffbf_u32,
     0xfdff_fffe_u32,
-    0xf7ffe_f7f_u32,
+    0xf7ff_ef7f_u32,
     0xf2f7_cbbf_u32,
     0x0000_0001_u32,
     0x0000_0000_u32,
