@@ -11,6 +11,9 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v1
+    - uses: actions-rs/toolchain@v1
+      with:
+        toolchain: 1.53.0
     - uses: actions-rs/cargo@v1
       with:
         command: test
@@ -19,6 +22,9 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v1
+    - uses: actions-rs/toolchain@v1
+      with:
+        toolchain: 1.53.0
     - uses: actions-rs/cargo@v1
       with:
         command: fmt
@@ -28,6 +34,9 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v1
+    - uses: actions-rs/toolchain@v1
+      with:
+        toolchain: 1.53.0
     - uses: actions-rs/cargo@v1
       with:
         command: doc
@@ -37,6 +46,9 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v1
+    - uses: actions-rs/toolchain@v1
+      with:
+        toolchain: 1.53.0
     - uses: actions-rs/cargo@v1
       with:
         command: clippy
