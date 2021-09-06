@@ -113,36 +113,9 @@ pub fn sfmt_init_gen_rand(sfmt: &mut SFMT, seed: u32) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use rand_core::SeedableRng;
-    use std::{fs, io, io::BufRead};
 
-    fn split(a: i32x4) -> (u32, u32, u32, u32) {
-        (extract(a, 0), extract(a, 1), extract(a, 2), extract(a, 3))
-    }
-
-    fn read_answer(filename: &str) -> Result<Vec<i32x4>, io::Error> {
-        let f = io::BufReader::new(fs::File::open(filename)?);
-        Ok(f.lines()
-            .map(|line| {
-                let vals: Vec<_> = line
-                    .unwrap()
-                    .split(" ")
-                    .map(|s| s.trim().parse().unwrap())
-                    .collect();
-                new(vals[0], vals[1], vals[2], vals[3])
-            })
-            .collect())
-    }
-
-    #[test]
-    fn test_init() {
-        let seed: u32 = 1234;
-        let seed = unsafe { *(&seed as *const u32 as *const [u8; 4]) };
-        let sfmt = SFMT::from_seed(seed);
-        let ans = read_answer("check/init1234.txt").unwrap();
-        for (v, a) in sfmt.state.iter().zip(ans.iter()) {
-            assert_eq!(split(*v), split(*a));
-        }
+    fn split(a: i32x4) -> [u32; 4] {
+        [extract(a, 0), extract(a, 1), extract(a, 2), extract(a, 3)]
     }
 
     #[test]
