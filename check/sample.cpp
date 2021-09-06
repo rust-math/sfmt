@@ -1,8 +1,9 @@
 /**
- * Generate u64 random integers as a reference
+ * Generate u64 random integers using original SFMT implementation
  *
  * - Seed is fixed value (seed=1234)
- * - Generate 10000 numbers
+ * - Generate 10000 integers
+ * - `SFMT_MEXP` will be set as a compiler flag. See Makefile.
  */
 #include "./SFMT-src-1.5.1/SFMT.h"
 #include <iostream>
