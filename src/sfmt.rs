@@ -274,14 +274,14 @@ parms_impl!(
     7,
     19,
     1,
-    0xfdbf_bff7_u32,
-    0xfd77_efff_u32,
+    0xfdbf_fbff_u32,
+    0xbff7_ff3f_u32,
     0xfd77_efff_u32,
     0xbf9f_f3ff_u32,
     0x0000_0001_u32,
     0x0000_0000_u32,
     0x0000_0000_u32,
-    0x3952_8d85_u32
+    0xe952_8d85_u32
 );
 parms_impl!(
     132049,
