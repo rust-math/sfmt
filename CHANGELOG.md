@@ -1,6 +1,11 @@
 Unreleased
 -----------
 
+Added
+-----
+- Another Mersenne primes are supported https://github.com/rust-math/sfmt/pull/30
+- Test for comparing to the original SFMT implementation https://github.com/rust-math/sfmt/pull/34
+
 Maintenance
 ------------
 - Switch CI from Azure Pipeline to GitHub Actions https://github.com/rust-math/sfmt/pull/33
